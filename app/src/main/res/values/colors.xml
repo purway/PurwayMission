@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="transparent">#00000000</color>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="collect_disable">#7f009df6</color>
+    <color name="white">#FFFFFF</color>
+    <color name="background_blue">#242d34</color>
+    <color name="dark_gray">#80000000</color>
+
+    <color name="limit_fill">#80FF0000</color>
+    <color name="auth_fill">#8000FF00</color>
+    <color name="gs_home_fill">#800000FF</color>
+
+    <color name="mission_pause_pressed">#b73914</color>
+    <color name="mission_pause_normal">#FD4D1A</color>
+    <color name="mission_start_pressed">#025e93</color>
+    <color name="mission_start_normal">#009DF6</color>
+
+    <color name="map_area">#d00094ff</color>
+</resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="fly_window_bottom">60dp</dimen>
+    <dimen name="fly_window_width">160dp</dimen>
+    <dimen name="fly_window_height">90dp</dimen>
+    <dimen name="ari_data_detail_drawer_width">400dp</dimen>
+
+    <dimen name="main_entry_grid_max_width">636dp</dimen>
+    <dimen name="action_bar_size">56dp</dimen>
+    <dimen name="main_entry_grid_height">328dp</dimen>
+
+    <!-- AirFlightActivity -->
+    <dimen name="flight_activity_status_bar_height">34dp</dimen>
+    <dimen name="flight_activity_bottom_bar_height">60dp</dimen>
+    <dimen name="flight_activity_sensor_data_text_size">16sp</dimen>
+    <dimen name="flight_activity_sensor_data_text_width">70dp</dimen>
+    <!-- AirFlightActivity -->
+
+    <dimen name="flight_activity_flight_state_height">24dp</dimen>
+</resources>

@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">铁路巡检</string>
+
+    <string name="fly_task">任务</string>
+    <string name="back">返回</string>
+
+    <string name="stopMission">取消任务</string>
+
+    <string name="mission_start">开始飞行任务</string>
+    <string name="mission_pause">暂停飞行任务</string>
+    <string name="mission_spacing">飞行间距：%s米</string>
+    <string name="mission_altitude">飞行高度：%s米</string>
+    <string name="mission_speed">飞行速度：%s米/秒</string>
+    <string name="mission_distance">航线长度：%s米</string>
+    <string name="mission_time">飞行时间：%s</string>
+    <string name="mission_timeInterval">拍照间隔：%s秒</string>
+    <string name="mission_gimbalPitch">云台俯角：%s度</string>
+    <string name="mission_ATH">完成后自动返航：</string>
+
+    <string name="mission_cancel">取消上传任务</string>
+    <string name="mission_resume">恢复飞行任务</string>
+    <string name="mission_upload">上传飞行任务</string>
+    <string name="mission_sure">确定</string>
+
+    <string name="mission_item_lat">经度：</string>
+    <string name="mission_item_long">纬度：</string>
+    <string name="mission_item_alt">高度：</string>
+
+    <string name="start_mission_alert">立即开始飞行任务\n请确保飞行器在安全的飞行状态</string>
+
+
+    <string name="fly_map_type_satellite">卫星地图</string>
+    <string name="fly_map_type_normal">标准地图</string>
+
+    <string name="item_low_battery_back">低电返航</string>
+    <string name="item_connection_fail_back">失控返航</string>
+    <string name="item_back_height">返航高度</string>
+
+    
+    <array name="mission_types">
+        <item>网格飞行</item>
+        <item>航点线路</item>
+    </array>
+</resources>

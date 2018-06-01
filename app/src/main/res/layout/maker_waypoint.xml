@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="200dp"
+    android:layout_height="50dp"
+    android:background="@color/white"
+    android:layout_gravity="center"
+    android:columnCount="2"
+    android:rowCount="3">
+
+    <TextView
+        android:text="经度："
+        android:textSize="10dp"/>
+    <TextView
+        android:id="@+id/textLatitude"
+        android:text="0.0"
+        android:textSize="10dp"/>
+
+    <TextView
+        android:text="纬度："
+        android:textSize="10dp"/>
+    <TextView
+        android:id="@+id/textLongitude"
+        android:text="0.0"
+        android:textSize="10dp"/>
+
+    <TextView
+        android:text="高度："
+        android:textSize="10dp"/>
+    <TextView
+        android:id="@+id/textHeight"
+        android:text="0.0"
+        android:textSize="10dp"/>
+
+</GridLayout>
