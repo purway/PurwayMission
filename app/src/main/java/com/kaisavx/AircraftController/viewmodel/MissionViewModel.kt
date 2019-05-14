@@ -238,6 +238,16 @@ class MissionViewModel(
                 .subscribe {
                     Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                 })
+        disposable.add(DJIManager2.isCameraInitSubject
+                .distinctUntilChanged()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (it) {
+                        showWaitDialog()
+                    } else {
+                        hideWaitDialog()
+                    }
+                })
 
     }
 

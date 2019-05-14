@@ -639,7 +639,6 @@ class FlightActivity : BaseActivity() {
                 .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    /*
                     if (it) {
                     } else {
                         flightOperator.stateSubject.onNext(DJIFlightOperator.FlightState.NONE)
@@ -652,7 +651,7 @@ class FlightActivity : BaseActivity() {
                     }
 
                     missionViewModel?.isFlying = it
-*/
+
                 })
 
         disposable.add(DJIManager2.isLandingNeedSubject
@@ -669,7 +668,6 @@ class FlightActivity : BaseActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     log(this, "isCameraInitSubject:$it")
-                    /*
                     if (it) {
                         loadingDialog.show()
                     } else {
@@ -683,7 +681,6 @@ class FlightActivity : BaseActivity() {
 
                         })
                     }
-                    */
                 })
 
         disposable.add(DJIManager2.aircraftNoSubject

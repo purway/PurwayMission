@@ -200,6 +200,9 @@ class MainActivity : BaseActivity() {
         super.onResume()
         logMethod(this)
 
+        if (DJIManager2.getFlightControllerInstance() == null) {
+            DJIManager2.isConnectedSubject.onNext(false)
+        }
     }
 
     override fun onPause() {
@@ -343,7 +346,7 @@ class MainActivity : BaseActivity() {
                     if(it){
                         waitDialog.show()
                     }else{
-                        waitDialog.dismiss()
+                        waitDialog.hide()
                     }
                 })
 
