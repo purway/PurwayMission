@@ -1,25 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.MainActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/deviceState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="disconnected"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="18dp"
+        android:layout_marginTop="18dp"
+        android:textSize="18sp"
+        android:textColor="@color/red"
+        android:text="@string/device_disconnect"/>
 
-    <Button
-        android:id="@+id/btn"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Button"/>
+        android:layout_height="match_parent"
+        android:layout_above="@id/deviceState">
 
-</android.support.constraint.ConstraintLayout>
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <TableRow>
+
+                <FrameLayout
+                    android:layout_width="250dp"
+                    android:layout_height="150dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp">
+
+                    <ImageButton
+                        android:id="@+id/btnFlyNow"
+                        android:layout_width="250dp"
+                        android:layout_height="150dp"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_device_entry" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|bottom"
+                        android:layout_marginBottom="12dp"
+                        android:text="@string/air_device_entry"
+                        android:textSize="18sp" />
+                </FrameLayout>
+
+
+                <FrameLayout
+                    android:layout_width="250dp"
+                    android:layout_height="150dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp">
+
+                    <ImageButton
+                        android:id="@+id/btnFlyRecord"
+                        android:layout_width="250dp"
+                        android:layout_height="150dp"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_data_entry" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|bottom"
+                        android:layout_marginBottom="12dp"
+                        android:text="@string/air_data_entry"
+                        android:textSize="18sp" />
+                </FrameLayout>
+            </TableRow>
+
+        </TableLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -8,6 +8,7 @@ import com.amap.api.maps.AMap
 import com.amap.api.maps.AMapUtils
 import com.amap.api.maps.model.*
 import com.kaisavx.AircraftController.R
+import com.kaisavx.AircraftController.util.log
 import dji.common.mission.waypoint.Waypoint
 import dji.common.model.LocationCoordinate2D
 
@@ -24,6 +25,7 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
     private var selectMarker:Marker?=null
     private var polygon: Polygon? = null
     private var route: Polyline? = null
+
 
     private var touchDownPoint: Point? = null
 
@@ -58,6 +60,8 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
         map.setOnMapLongClickListener {
             removeMarker(it)
         }
+
+
     }
 
     fun setType(type: ControlType) {
@@ -99,7 +103,7 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                //log(this , "ACTION_DOWN")
+               // log(this , "ACTION_DOWN")
                 moveCount = 0
                 if (state != State.None) {
                     return
@@ -151,7 +155,6 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
                     return
                 }
 
-
                 val marker = movingMarker ?: return
                 if (type == ControlType.Area) {
 
@@ -169,6 +172,7 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
                 } else {
                     val markerPosition = map.projection.fromScreenLocation(Point(x.toInt(), y.toInt()))
                     val position = map.projection.fromScreenLocation(Point(x.toInt(), y.toInt()))
+
                     movingMarker?.marker?.position = markerPosition
                     movingMarker?.wayPoint?.coordinate = LocationCoordinate2D(position.latitude , position.longitude)
                     onMarkerSelect?.invoke(movingMarker)
@@ -185,7 +189,7 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
                     when (state) {
                         State.AddMarker -> {
                             touchDownPoint?.let {
-                                val ll = map.projection.fromScreenLocation(it)
+                                val position = map.projection.fromScreenLocation(it)
                                 /*
                                 val wayPoint = Waypoint(ll.latitude, ll.longitude, 75f)
                                 wayPoint.heading = 0
@@ -196,7 +200,7 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
                                 wayPoint.shootPhotoTimeInterval = 2f
                                 wayPoint.shootPhotoDistanceInterval = 0f
                                 */
-                                val wayPoint = onNewWaypoint?.invoke(ll)
+                                val wayPoint = onNewWaypoint?.invoke(position)
                                 wayPoint?.let {
                                     addWayMarker(it)
                                 }
@@ -223,20 +227,24 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
     }
 
     fun setSelectMarker(location: LatLng){
+        //logMethod(this)
+
         if(selectMarker == null) {
+            log(this , "selectMarker is null")
             val options = MarkerOptions()
                     .anchor(0.5f, 0.5f)
                     .position(location)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.item_select))
-                    .zIndex(2f)
+                    .zIndex(5f)
             selectMarker = map.addMarker(options)
-        }else{
-            selectMarker?.position = location
-            selectMarker?.isVisible=true
+            selectMarker?.isClickable = false
         }
+        selectMarker?.position = location
+        selectMarker?.isVisible=true
     }
 
     fun removeSelectMarker(){
+        //logMethod(this)
         selectMarker?.isVisible= false
     }
 
@@ -283,7 +291,7 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
         marker.isClickable = false
         
         areaMarkers += WayHolder(marker , Waypoint(point.latitude , point.longitude , 0f))
-        //onMarkerUpdated?.invoke(areaMarkers.map { it.marker.position })
+
     }
 
     private fun isConvex(points: List<Point>): Boolean {
@@ -295,7 +303,6 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
         }
         return true
     }
-
 
     private fun getWayMarker(x: Float, y: Float): WayHolder? {
         return wayMarkers.find {
@@ -310,8 +317,6 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
             Math.abs(x - point.x) < 50 && Math.abs(y - point.y) < 50
         }
     }
-
-    
 
     fun clear() {
         wayMarkers.forEach { it.marker.remove() }
@@ -391,6 +396,15 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
         val maxY = pointsSortByY.last().y
 
         val topPoint = pointsSortByY.first()
+
+        for(i in points.indices){
+            if(points[i] == topPoint){
+                areaMarkers[i].marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.item_group))
+            }else{
+                areaMarkers[i].marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.item_air_data_point_red))
+            }
+        }
+
         val bottomPoint = pointsSortByY.last()
 
         val topPointIndex = points.indexOf(topPoint)
@@ -486,6 +500,8 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
     
 
     fun setWayMakerPoints(wayPoints: List<Waypoint>){
+        setSelectMarker(LatLng(0.0,0.0))
+        selectMarker?.isVisible=false
         wayMarkers.forEach{it.marker.remove()}
         
         wayPoints.forEach { addWayMarker(it) }
@@ -493,7 +509,8 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
     
     fun setAreaMakerPoints(points:List<LatLng>){
         areaMarkers.forEach { it.marker.remove() }
-        points.forEach { addAreaMarker(it) }
+        points.forEach {addAreaMarker(it) }
+
         drawArea(points)
 
         onMarkerUpdated?.invoke(areaMarkers.map { it.marker.position })
@@ -505,6 +522,7 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
         this.interval = interval
         if (type == ControlType.Area && isDrawRoute) {
             drawRoute(createRoutePoints(areaMarkers.map { it.marker.position }))
+            onAreaPointUpdated?.invoke(getRoute().points)
         }
     }
 
@@ -537,5 +555,4 @@ class MapMissionController(val map: AMap, val context: Context) : AMap.OnMapTouc
         getRoute().points = points
         //onWayPointUpdated?.invoke(points)
     }
-
 }

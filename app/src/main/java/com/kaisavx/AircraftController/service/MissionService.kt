@@ -1,9 +1,9 @@
 package com.kaisavx.AircraftController.service
 
 import com.amap.api.maps.model.LatLng
+import com.kaisavx.AircraftController.RealmObject.MissionData
+import com.kaisavx.AircraftController.RealmObject.WayPointData
 import com.kaisavx.AircraftController.interfaces.WayPointOperator
-import com.kaisavx.AircraftController.model.MissionData
-import com.kaisavx.AircraftController.model.WayPointData
 import com.kaisavx.AircraftController.util.NullableObject
 import com.kaisavx.AircraftController.util.RealmKit
 import com.kaisavx.AircraftController.util.log
@@ -23,56 +23,69 @@ import java.util.*
 
 
 enum class MissionState {
-    None, Uploading, Executing, Paused, Resuming, ReadyToExecuting
+    None, Uploading, Executing, Paused, Resuming, ReadyToExecuting ,Finish
 }
 
 // type 0: Area 1: Path
-class Mission(var center: LatLng, val type: Int) {
-    var id: String = ""
-    var spacing = 30F
-    var address = ""
-    var createdAt = Date().time
+class Mission(val addressLatitude:Double , val addressLongitude:Double, val type: Int) {
 
-    var altitude = 75F
-    var speed = 5F
-    var timeInterval = 2f
-    var distanceInterval = 0f
-    var gimbalPitch = 0f
-    var finishedAction: WaypointMissionFinishedAction = WaypointMissionFinishedAction.GO_HOME
-
-    var isAltitudeOverall = false
-    var isSpeedOverall = false
-    var isTimeIntervalOverall = false
-    var isDistanceOverall = false
-    var isGimbalPitchOverall = false
-
-    var markerPoints: List<LatLng> = listOf()
-
-    var wayPoints: List<Waypoint> = listOf()
-
-    init {
-        id = UUID.randomUUID().toString()
-        if (type == 0) {
-            isAltitudeOverall = true
-            isSpeedOverall = true
-            isTimeIntervalOverall = true
-            isDistanceOverall = true
-            isGimbalPitchOverall = true
-        }
+    companion object {
+        val SPACING = 30F
+        val ALTITUDE = 75F
+        val SPEED = 5F
+        val TIME_INTERVAL = 10F
+        val DISTANCE_INTERVAL = 0F
+        val GIMBAL_PITCH = -70f
+        val FINISHED_ACTION = WaypointMissionFinishedAction.GO_HOME.value()
     }
 
-    constructor(data: MissionData) : this(LatLng(data.addressLatitude, data.addressLongitude), data.type) {
+    var __id:String?=null
+    var id: String?=null
+    var userId:String?=null
+    var name=""
+    var spacing = SPACING
+    var address = ""
+    var createdTime = Date().time
+
+    var bearing=0f
+
+    var altitude = ALTITUDE
+    var speed = SPEED
+    var timeInterval = TIME_INTERVAL
+    var distanceInterval = DISTANCE_INTERVAL
+    var gimbalPitch = GIMBAL_PITCH
+    var finishedAction = FINISHED_ACTION
+
+    var isAltitudeOverall = true
+    var isSpeedOverall = true
+    var isTimeIntervalOverall = true
+    var isDistanceOverall = true
+    var isGimbalPitchOverall = true
+
+    var markerPointList: List<LatLng> = listOf()
+
+    var wayPointList: List<Waypoint> = listOf()
+
+    init {
+        __id=UUID.randomUUID().toString()
+    }
+
+    constructor(data: MissionData) : this(data.addressLatitude, data.addressLongitude, data.type) {
+        __id = data._id
         id = data.id
+        userId = data.userId
+        name =data.name
         address = data.address
         spacing = data.spacing
-        createdAt = data.createdAt
+        createdTime = data.createdAt
 
+        bearing = data.bearing
         altitude = data.altitude
         speed = data.speed
         timeInterval = data.timeInterval
         distanceInterval = data.distanceInterval
         gimbalPitch = data.gimbalPitch
-        finishedAction = WaypointMissionFinishedAction.find(data.finishedAction)
+        finishedAction = data.finishedAction
 
         isAltitudeOverall = data.isAltitudeOverall
         isSpeedOverall = data.isSpeedOverall
@@ -80,9 +93,9 @@ class Mission(var center: LatLng, val type: Int) {
         isDistanceOverall = data.isDistanceOverall
         isGimbalPitchOverall = data.isGimbalPitchOverall
 
-        markerPoints = parseByteDataToPoints(data.markerPointsData)
+        markerPointList = parseByteDataToPoints(data.markerPointsData)
 
-        data.wayPointsData.map {
+        wayPointList=data.wayPointsData.map {
             val waypoint = Waypoint(it.latitude, it.longitude, it.altitude)
             waypoint.heading = it.heading
             waypoint.cornerRadiusInMeters = it.cornerRadiusInMeters
@@ -92,7 +105,9 @@ class Mission(var center: LatLng, val type: Int) {
             waypoint.shootPhotoTimeInterval = it.shootPhotoTimeInterval
             waypoint.shootPhotoDistanceInterval = it.shootPhotoDistanceInterval
 
-            wayPoints += waypoint
+            waypoint
+
+            //log(this , "waypoint : $waypoint")
         }
 
         //wayPoints = parseByteDataToPoints(data.wayPointsData)
@@ -101,32 +116,51 @@ class Mission(var center: LatLng, val type: Int) {
     fun save() {
         logMethod(this)
 
-        RealmKit.executeTransaction {
-            var exist = it.where(MissionData::class.java)
-                    .equalTo("id", id)
-                    .findFirst()
+        RealmKit.executeTransaction {realm ->
+            log(this,"id:$id __id:$__id")
+            var exist: MissionData?=null
+
+            __id?.let {
+                exist = realm.where(MissionData::class.java)
+                        .equalTo("_id", __id).findFirst()
+            }
+
+
+
+            if(exist == null){
+                id?.let {
+                    exist = realm.where(MissionData::class.java)
+                            .equalTo("id", id).findFirst()
+                }
+            }
+
             if (exist == null) {
                 log(this, "exist is null create")
-                exist = it.createObject(MissionData::class.java)
+                exist = realm.createObject(MissionData::class.java)
+
             } else {
                 log(this, "exist is exist")
             }
 
             exist?.id = id
+            exist?._id=__id
+            exist?.userId = userId
             exist?.type = type
             exist?.address = address
+            exist?.name = name
             exist?.spacing = spacing
-            exist?.createdAt = createdAt
+            exist?.createdAt = createdTime
 
-            exist?.addressLatitude = center.latitude
-            exist?.addressLongitude = center.longitude
+            exist?.addressLatitude = addressLatitude
+            exist?.addressLongitude = addressLongitude
 
+            exist?.bearing = bearing
             exist?.altitude = altitude
             exist?.speed = speed
             exist?.timeInterval = timeInterval
             exist?.distanceInterval = distanceInterval
             exist?.gimbalPitch = gimbalPitch
-            exist?.finishedAction = finishedAction.value()
+            exist?.finishedAction = finishedAction
 
             exist?.isAltitudeOverall = isAltitudeOverall
             exist?.isSpeedOverall = isSpeedOverall
@@ -134,10 +168,12 @@ class Mission(var center: LatLng, val type: Int) {
             exist?.isDistanceOverall = isDistanceOverall
             exist?.isGimbalPitchOverall = isGimbalPitchOverall
 
-            exist?.markerPointsData = generatePointsData(markerPoints)
+            exist?.markerPointsData = generatePointsData(markerPointList)
             exist?.wayPointsData?.clear()
-            wayPoints.map {
-                //log(this , "${it}")
+            //log(this , "finishedAction:$finishedAction")
+            log(this , "wayPointList:${wayPointList.size}")
+            wayPointList.map {
+                log(this , "shootPotoTimeInterval:${it.shootPhotoTimeInterval}")
                 val wayPointData = WayPointData()
                 wayPointData.latitude = it.coordinate.latitude
                 wayPointData.longitude = it.coordinate.longitude
@@ -206,11 +242,12 @@ class MissionService(val operator: WayPointOperator) {
         missionListSubject.onNext(missions)
     }
 
-    fun newMission(center: LatLng, type: Int, markerPoints: List<LatLng>) {
+    fun newMission(center: LatLng, type: Int, markerPointList: List<LatLng>) {
         log(this, "newMission")
-        val newMission = Mission(center, type)
+        val newMission = Mission(center.latitude,center.longitude, type)
         newMission.address = "${center.longitude}, ${center.latitude}"
-        newMission.markerPoints = markerPoints
+        newMission.name = newMission.address
+        newMission.markerPointList = markerPointList
 
         setCurrentMission(newMission)
 
@@ -224,7 +261,7 @@ class MissionService(val operator: WayPointOperator) {
         if(mission.isAltitudeOverall){
             altitude = mission.altitude
         }else{
-            altitude = 75f
+            altitude = Mission.ALTITUDE
         }
 
         val wayPoint = Waypoint(position.latitude, position.longitude, altitude)
@@ -235,30 +272,49 @@ class MissionService(val operator: WayPointOperator) {
         if(mission.isSpeedOverall){
             wayPoint.speed = mission.speed
         }else{
-            wayPoint.speed = 5f
+            wayPoint.speed = Mission.SPEED
         }
         if(mission.isTimeIntervalOverall){
             wayPoint.shootPhotoTimeInterval = mission.timeInterval
         }else{
-            wayPoint.shootPhotoTimeInterval = 2f
+            wayPoint.shootPhotoTimeInterval = Mission.TIME_INTERVAL
         }
         if(mission.isGimbalPitchOverall){
             wayPoint.gimbalPitch = mission.gimbalPitch
         }else {
-            wayPoint.gimbalPitch = -90f
+            wayPoint.gimbalPitch = Mission.GIMBAL_PITCH
         }
         if(mission.isDistanceOverall){
             wayPoint.shootPhotoDistanceInterval = mission.distanceInterval
         }else{
-            wayPoint.shootPhotoDistanceInterval = 0f
+            wayPoint.shootPhotoDistanceInterval = Mission.DISTANCE_INTERVAL
         }
 
         return wayPoint
     }
 
+    fun addMission(m:Mission){
+        var flag = true
+        missions.forEach {
+            if(m.id == it.id){
+                flag = false
+            }
+        }
+        if(flag){
+            m.save()
+            missions.add(m)
+            missionListSubject.onNext(missions)
+            log(this ,"add mission:${m.id} ")
+        }else{
+            log(this ,"mission is exist")
+        }
+
+
+    }
+
     fun deleteMission(mission: Mission) {
         mission.delete()
-        if (mission == currentMissionSubject.value.value) {
+        if (mission == currentMissionSubject.value!!.value) {
             setCurrentMission(null)
         }
         missions.remove(mission)
@@ -298,10 +354,10 @@ class MissionService(val operator: WayPointOperator) {
                 .where(MissionData::class.java)
                 .findAll()
                 .map {
-                    //log(this , "$it")
+                    log(this , "$it")
 
                     it.wayPointsData.map {
-                        //log(this , "$it")
+                        log(this , "$it")
                     }
                     Mission(it)
                 }

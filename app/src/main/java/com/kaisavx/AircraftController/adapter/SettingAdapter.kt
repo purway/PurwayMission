@@ -14,12 +14,15 @@ class SettingAdapter(private val context:Context , private val dataList : ArrayL
     companion object {
         val ITEM_SEEKBAR = 1
         val ITEM_SWITCH = 2
+        val ITEM_IMAGE_TEXT =3
 
         val KEY_TYPE ="type"
         val KEY_TITLE = "title"
         val KEY_VALUE = "value"
+        val KEY_ICON ="icon"
         val KEY_MIN = "min"
         val KEY_MAX = "max"
+        val KEY_SEEK_BAR_TEXT="seekBarText"
         val KEY_SEEK_BAR_CHANGE_LISTENER = "seekBarChangeListener"
         val KEY_SWITCH_CHANGE_LISTENER = "switchChangeListener"
 
@@ -30,7 +33,19 @@ class SettingAdapter(private val context:Context , private val dataList : ArrayL
 
     val seekBarChangeListener = object:SeekBar.OnSeekBarChangeListener{
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+
+            seekBar?.let {
+                it.tag?.let {
+                    it as PositionHolder
+                    val position = it.position
+                    val m = getItem(position) as HashMap<String, Any>
+                    val listener = m[KEY_SEEK_BAR_CHANGE_LISTENER] as SeekBar.OnSeekBarChangeListener
+
+                    listener.onProgressChanged(seekBar, progress, fromUser)
+
+                }
             }
+        }
 
         override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
@@ -59,6 +74,7 @@ class SettingAdapter(private val context:Context , private val dataList : ArrayL
                     val position = it.position
                     val map = getItem(position) as HashMap<String , Any>
 
+                    log(this , "position:$position , b:$isChecked")
                     val listener = map[KEY_SWITCH_CHANGE_LISTENER] as CompoundButton.OnCheckedChangeListener
                     listener.onCheckedChanged(buttonView,isChecked)
                 }
@@ -67,7 +83,7 @@ class SettingAdapter(private val context:Context , private val dataList : ArrayL
     }
 
 
-    val TYPE_MAX = 3
+    val TYPE_MAX = 4
 
     init{
         inflater = LayoutInflater.from(context)
@@ -136,8 +152,18 @@ class SettingAdapter(private val context:Context , private val dataList : ArrayL
                     view = inflater?.inflate(R.layout.item_switch , null)
                     holder.title = view?.findViewById(R.id.checkboxTitle)
                     holder.switch = view?.findViewById(R.id.switchor)
+                    holder.dataText = view?.findViewById(R.id.textMsg)
                     holder.switch?.setOnCheckedChangeListener(switchChangeListener)
+
                 }
+
+                ITEM_IMAGE_TEXT->{
+                    view = inflater?.inflate(R.layout.item_image_text , null)
+                    holder.title = view?.findViewById(R.id.textTitle)
+                    holder.imageView = view?.findViewById(R.id.imageIcon)
+                    holder.dataText = view?.findViewById(R.id.textMsg)
+                }
+
             }
             view?.tag = holder
         }else{
@@ -149,46 +175,77 @@ class SettingAdapter(private val context:Context , private val dataList : ArrayL
 
         when(type){
             ITEM_SEEKBAR -> {
-                holder.title?.setText(map[KEY_TITLE] as String)
+                holder.title?.let {
+                    it.setText(map[KEY_TITLE] as String)
+
+                }
+
+
                 holder.seekBar?.let { seekBar ->
                     val value = map[KEY_VALUE] as Int
                     val min = map[KEY_MIN] as Int
                     val max = map[KEY_MAX] as Int
                     val process = value - min
 
-                    //log(this, "${position} value:${value} min:${min} max:${max} process:${process}")
+                    val tag = seekBar.tag
+                    if(tag != null){
+                        val seekBarHolder = tag as PositionHolder
+                        seekBarHolder.position = position
+
+                    }else{
+                        val seekBarHolder = PositionHolder()
+                        seekBarHolder.position = position
+                        seekBar.tag =seekBarHolder
+                    }
+
                     seekBar.setProgress(process)
                     seekBar.max = max - min
 
-                    var tag = seekBar.tag
-                    if(tag == null){
-                        var seekBarHolder = PositionHolder()
-                        seekBarHolder.position = position
-                        seekBar.tag =seekBarHolder
-                    }else{
-                        var seekBarHolder = tag as PositionHolder
-                        seekBarHolder.position = position
-                    }
-
                 }
-                holder.dataText?.setText(map[KEY_DATA_TEXT] as String)
+                holder.dataText?.let{
+                    it.setText(map[KEY_DATA_TEXT] as String)
+                    map[KEY_SEEK_BAR_TEXT] = it
+                }
             }
 
             ITEM_SWITCH -> {
                 holder.title?.setText(map[KEY_TITLE] as String)
                 holder.switch?.let {switch ->
-                    switch.setChecked(map[KEY_VALUE] as Boolean)
-                    var tag = switch.tag
-                    if(tag == null){
-                        var positionHolder = PositionHolder()
+
+                    val tag = switch.tag
+                    if(tag != null){
+                        val positionHolder = tag as PositionHolder
+                        positionHolder.position = position
+                    }else{
+                        val positionHolder = PositionHolder()
                         positionHolder.position = position
                         switch.tag = positionHolder
-                    }else{
-                        var positionHolder = tag as PositionHolder
-                        positionHolder.position = position
-
                     }
+                    switch.isChecked = map[KEY_VALUE] as Boolean
+
                 }
+                if(map[KEY_DATA_TEXT]!=null){
+                    holder.dataText?.setText(map[KEY_DATA_TEXT] as String)
+                }else{
+                    holder.dataText?.setText("")
+                }
+            }
+            ITEM_IMAGE_TEXT->{
+                holder.title?.text = map[KEY_TITLE] as String
+
+                val dataText = map[KEY_DATA_TEXT]
+                if(dataText!=null){
+                    holder.dataText?.text = dataText as String
+                }else {
+                    holder.dataText?.text = null
+                }
+
+                val icon = map[KEY_ICON]
+                if(icon!=null) {
+                    holder.imageView?.setImageDrawable(context.resources.getDrawable(icon as Int))
+                }else{
+                }
+
             }
 
         }
@@ -202,6 +259,7 @@ class SettingAdapter(private val context:Context , private val dataList : ArrayL
 
     inner class Holder{
         var position:Int=0
+        var imageView:ImageView?=null
         var title: TextView?=null
         var switch:Switch?=null
         var seekBar:SeekBar?=null

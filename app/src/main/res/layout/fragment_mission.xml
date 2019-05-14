@@ -6,10 +6,12 @@
     android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/layoutTitle"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_weight="1"
         android:background="#F1F1F1">
+
         <TextView
             android:id="@+id/textTitle"
             android:layout_width="wrap_content"
@@ -64,6 +66,9 @@
         android:layout_weight="1000"
         android:orientation="vertical"
         android:visibility="gone">
+
+
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,207 +79,72 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingBottom="30dp">
-                    <TextView
-                        android:id="@+id/textDistance"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="8dp"
-                        android:text="@string/mission_distance"
-                        android:textColor="#1892E8"
-                        android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/textDistance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="@string/mission_distance"
+                    android:textColor="#1892E8"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/textTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="@string/mission_time"
+                    android:textColor="#1892E8"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/textSpacing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="@string/mission_spacing"
+                    android:textColor="#3D3D3D"
+                    android:textSize="13sp" />
+
+                <LinearLayout
+                    android:id="@+id/linearSpacing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
 
                     <TextView
-                        android:id="@+id/textTime"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="8dp"
-                        android:text="@string/mission_time"
-                        android:textColor="#1892E8"
-                        android:textSize="13sp" />
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:minWidth="18dp"
+                        android:text="10"
+                        android:textColor="#9A9A9A"
+                        android:textSize="12sp" />
+
+                    <SeekBar
+                        android:id="@+id/seekbarSpacing"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:max="450"
+                        android:paddingBottom="4dp"
+                        android:paddingTop="4dp"
+                        android:progress="10" />
 
                     <TextView
-                        android:id="@+id/textSpacing"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="8dp"
-                        android:text="@string/mission_spacing"
-                        android:textColor="#3D3D3D"
-                        android:textSize="13sp" />
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:minWidth="18dp"
+                        android:text="500"
+                        android:textColor="#9A9A9A"
+                        android:textSize="12sp" />
 
-                    <LinearLayout
-                        android:id="@+id/linearSpacing"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:minWidth="18dp"
-                            android:text="10"
-                            android:textColor="#9A9A9A"
-                            android:textSize="12sp" />
-
-                        <SeekBar
-                            android:id="@+id/seekbarSpacing"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:max="450"
-                            android:paddingBottom="4dp"
-                            android:paddingTop="4dp"
-                            android:progress="10" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:minWidth="18dp"
-                            android:text="500"
-                            android:textColor="#9A9A9A"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginTop="8dp"
-                        android:background="#D6D6D6" />
-
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:id="@+id/textAltitude"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="@string/mission_altitude"
-                            android:textColor="#3D3D3D"
-                            android:textSize="13sp" />
-
-                        <Switch
-                            android:id="@+id/switchAltitude"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"/>
-                    </RelativeLayout>
-
-
-                    <LinearLayout
-                        android:id="@+id/linearAltitude"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:minWidth="18dp"
-                            android:text="30"
-                            android:textColor="#9A9A9A"
-                            android:textSize="12sp" />
-
-                        <SeekBar
-                            android:id="@+id/seekbarAltitude"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:max="270"
-                            android:paddingBottom="4dp"
-                            android:paddingTop="4dp"
-                            android:progress="20" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:minWidth="18dp"
-                            android:text="300"
-                            android:textColor="#9A9A9A"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginTop="8dp"
-                        android:background="#D6D6D6" />
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
-                        <TextView
-                            android:id="@+id/textSpeed"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="飞行速度：5米/秒"
-                            android:textColor="#3D3D3D"
-                            android:textSize="13sp" />
-
-                        <Switch
-                            android:id="@+id/switchSpeed"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"/>
-                    </RelativeLayout>
-
-
-                    <LinearLayout
-                        android:id="@+id/linearSpeed"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:minWidth="18dp"
-                            android:text="1"
-                            android:textColor="#9A9A9A"
-                            android:textSize="12sp" />
-
-                        <SeekBar
-                            android:id="@+id/seekbarSpeed"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_weight="1"
-                            android:max="9"
-                            android:paddingBottom="4dp"
-                            android:paddingTop="4dp"
-                            android:progress="4" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:minWidth="18dp"
-                            android:text="10"
-                            android:textColor="#9A9A9A"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
@@ -283,33 +153,139 @@
                     android:layout_marginTop="8dp"
                     android:background="#D6D6D6" />
 
-                <RelativeLayout
+                <TextView
+                    android:id="@+id/textAltitude"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:id="@+id/textGimbalPitch"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="8dp"
-                        android:text="@string/mission_gimbalPitch"
-                        android:textColor="#3D3D3D"
-                        android:textSize="13sp" />
+                    android:padding="8dp"
+                    android:text="@string/mission_altitude"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textColor="#3D3D3D"
+                    android:textSize="13sp" />
 
-                    <Switch
-                        android:id="@+id/switchGimbalPitch"
+                <LinearLayout
+                    android:id="@+id/linearAltitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"/>
-                </RelativeLayout>
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:minWidth="18dp"
+                        android:text="30"
+                        android:textColor="#9A9A9A"
+                        android:textSize="12sp" />
+
+                    <SeekBar
+                        android:id="@+id/seekbarAltitude"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:max="270"
+                        android:paddingBottom="4dp"
+                        android:paddingTop="4dp"
+                        android:progress="20" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:minWidth="18dp"
+                        android:text="300"
+                        android:textColor="#9A9A9A"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#D6D6D6" />
+
+                <TextView
+                    android:id="@+id/textSpeed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@string/mission_speed"
+                    android:textColor="#3D3D3D"
+                    android:textSize="13sp" />
+
+
+                <LinearLayout
+                    android:id="@+id/linearSpeed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:minWidth="18dp"
+                        android:text="1"
+                        android:textColor="#9A9A9A"
+                        android:textSize="12sp" />
+
+                    <SeekBar
+                        android:id="@+id/seekbarSpeed"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:max="9"
+                        android:paddingBottom="4dp"
+                        android:paddingTop="4dp"
+                        android:progress="4" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:minWidth="18dp"
+                        android:text="10"
+                        android:textColor="#9A9A9A"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#D6D6D6" />
+
+                <TextView
+                    android:id="@+id/textGimbalPitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="@string/mission_gimbalPitch"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textColor="#3D3D3D"
+                    android:textSize="13sp" />
 
 
                 <LinearLayout
                     android:id="@+id/linearGimbalPitch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:padding="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -344,22 +320,24 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginTop="8dp"
-                        android:background="#D6D6D6" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#D6D6D6" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
+                    android:padding="8dp">
                     <TextView
                         android:id="@+id/textShootTimeInterval"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="8dp"
+                        android:layout_centerVertical="true"
+                        android:ellipsize="end"
+                        android:singleLine="true"
                         android:text="@string/mission_timeInterval"
                         android:textColor="#3D3D3D"
                         android:textSize="13sp" />
@@ -368,81 +346,93 @@
                         android:id="@+id/switchShootTimeInterval"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:layout_alignParentRight="true"/>
                 </RelativeLayout>
+                <!--
+                <TextView
+                    android:id="@+id/textShootTimeInterval"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="@string/mission_timeInterval"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textColor="#3D3D3D"
+                    android:textSize="13sp" />
+                -->
 
+                <LinearLayout
+                    android:id="@+id/linearShootTimeInterval"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
 
-                    <LinearLayout
-                        android:id="@+id/linearShootTimeInterval"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="8dp">
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:minWidth="18dp"
+                        android:text="2"
+                        android:textColor="#9A9A9A"
+                        android:textSize="12sp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:minWidth="18dp"
-                            android:text="2"
-                            android:textColor="#9A9A9A"
-                            android:textSize="12sp" />
-
-                        <SeekBar
-                            android:id="@+id/seekbarShootTimeInterval"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_weight="1"
-                            android:max="18"
-                            android:paddingBottom="4dp"
-                            android:paddingTop="4dp"
-                            android:progress="4" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:minWidth="18dp"
-                            android:text="20"
-                            android:textColor="#9A9A9A"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginTop="8dp"
-                        android:background="#D6D6D6" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <SeekBar
+                        android:id="@+id/seekbarShootTimeInterval"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="8dp">
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:max="18"
+                        android:paddingBottom="4dp"
+                        android:paddingTop="4dp"
+                        android:progress="4" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/mission_ATH" />
-
-                        <Switch
-                            android:id="@+id/switchATH"
-                            android:switchMinWidth="50dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                        <!--
-                        <CheckBox
-                            android:id="@+id/checkboxATH"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                            -->
-                    </LinearLayout>
-
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:minWidth="18dp"
+                        android:text="20"
+                        android:textColor="#9A9A9A"
+                        android:textSize="12sp" />
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#D6D6D6" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mission_ATH" />
+
+                    <Switch
+                        android:id="@+id/switchATH"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:switchMinWidth="50dp" />
+                    <!--
+                    <CheckBox
+                        android:id="@+id/checkboxATH"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                        -->
+                </LinearLayout>
+
+            </LinearLayout>
 
 
         </ScrollView>
@@ -514,16 +504,28 @@
     <LinearLayout
         android:id="@+id/linearItem"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1000"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="gone"
-        >
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="#F1F1F1">
+            <TextView
+                android:text="@string/mission_item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_weight="1000">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -535,8 +537,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -547,8 +548,8 @@
                     <Button
                         android:id="@+id/btnLatSub"
                         android:layout_width="40dp"
-                        android:layout_weight="1"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="-" />
 
                     <EditText
@@ -572,8 +573,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -672,8 +672,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:padding="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -726,8 +726,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:padding="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -769,20 +769,34 @@
                     android:layout_marginTop="8dp"
                     android:background="#D6D6D6" />
 
-                <TextView
-                    android:id="@+id/textItemShootTimeInterval"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:text="@string/mission_timeInterval"
-                    android:textColor="#3D3D3D"
-                    android:textSize="13sp" />
+                    android:padding="8dp">
+                    <TextView
+                        android:id="@+id/textItemShootTimeInterval"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/mission_timeInterval"
+                        android:textColor="#3D3D3D"
+                        android:textSize="13sp" />
+
+                    <Switch
+                        android:id="@+id/switchItemShootTimeInterval"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
+
 
                 <LinearLayout
+                    android:id="@+id/linearItemShootTimeInterval"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:padding="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -819,12 +833,15 @@
 
             </LinearLayout>
         </ScrollView>
+
         <Button
             android:id="@+id/btnSure"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:background="@drawable/mission_start_button"
+            android:background="@drawable/btn_shape"
             android:text="@string/mission_sure"
             android:textColor="#FFFFFF"
             android:textSize="15sp" />

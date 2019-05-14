@@ -11,7 +11,6 @@ import com.amap.api.maps.model.*
 import com.kaisavx.AircraftController.R
 
 
-
 /**
  * Created by Abner on 2017/5/26.
  */
@@ -19,15 +18,15 @@ import com.kaisavx.AircraftController.R
 class FlightPathDrawer(val map: AMap, val context: Context) {
     private var lastPoint: LatLng? = null
     private var flightMarker: Marker? = null
-    private var selfMarker:Marker?=null
-    private var homeMarker:Marker?=null
-    private var wayPointOptionMarker:Marker?=null
+    private var selfMarker: Marker? = null
+    private var homeMarker: Marker? = null
+    private var wayPointOptionMarker: Marker? = null
     private var path: Polyline? = null
+
+    private var flyRoute:Polyline ?= null
 
     private var recordMarkers: ArrayList<Marker> = arrayListOf()
     private var sampleMarkers: ArrayList<Marker> = arrayListOf()
-
-
 
     private var selectPointMarker: Marker? = null
 
@@ -117,24 +116,25 @@ class FlightPathDrawer(val map: AMap, val context: Context) {
     }
 
 
-    fun setHomeMaker(point:LatLng){
-        if(homeMarker == null){
+    fun setHomeMaker(point: LatLng) {
+        if (homeMarker == null) {
             val options = MarkerOptions()
                     .anchor(0.5f, 1.0f)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_home))
                     .position(point)
                     .zIndex(99f)
             homeMarker = map.addMarker(options)
-        }else{
+        } else {
             homeMarker?.position = point
         }
     }
-    fun removeHomeMaker(){
+
+    fun removeHomeMaker() {
         homeMarker?.remove()
     }
 
-    fun setWaypointOptionMaker(point:LatLng , altitude:Float){
-        val view = View.inflate(context , R.layout.maker_waypoint,null)
+    fun setWaypointOptionMaker(point: LatLng, altitude: Float) {
+        val view = View.inflate(context, R.layout.maker_waypoint, null)
         val textLatitude = view.findViewById<TextView>(R.id.textLatitude)
         val textLongitude = view.findViewById<TextView>(R.id.textLongitude)
         val textHeihgt = view.findViewById<TextView>(R.id.textHeight)
@@ -142,21 +142,21 @@ class FlightPathDrawer(val map: AMap, val context: Context) {
         textLongitude.text = "${point.longitude}"
         textHeihgt.text = "$altitude"
         val icon = BitmapDescriptorFactory.fromView(view)
-        if(wayPointOptionMarker == null){
+        if (wayPointOptionMarker == null) {
             val options = MarkerOptions()
-                    .anchor(0.5f,1.0f)
+                    .anchor(0.5f, 1.0f)
                     .icon(icon)
                     .position(point)
                     .zIndex(100f)
             wayPointOptionMarker = map.addMarker(options)
-        }else{
+        } else {
             wayPointOptionMarker?.position = point
             wayPointOptionMarker?.setIcon(icon)
             wayPointOptionMarker?.showInfoWindow()
         }
     }
 
-    fun hideWaypointOptionMaker(){
+    fun hideWaypointOptionMaker() {
         wayPointOptionMarker?.hideInfoWindow()
     }
 
@@ -181,6 +181,22 @@ class FlightPathDrawer(val map: AMap, val context: Context) {
 
     fun setFlightAngle(angle: Float) {
         flightMarker?.rotateAngle = angle
+    }
+
+    fun setFlyRoute(routeList:List<LatLng>){
+        if(flyRoute == null){
+            val options = PolylineOptions()
+            options.color(ContextCompat.getColor(context,R.color.collect_disable))
+            options.width(5F)
+            options.zIndex(5F)
+            flyRoute = map.addPolyline(options)
+        }
+        flyRoute?.points = routeList
+    }
+
+    fun clearFlyRoute(){
+        flyRoute?.remove()
+        flyRoute = null
     }
 
     fun clear() {

@@ -45,7 +45,7 @@ class TCPLog(port:Int , filePath:String) {
     private fun getSocket(serverSocket:ServerSocket): Socket?{
         try{
             return serverSocket.accept()
-        }catch (e:IOException){
+        }catch (e:Exception){
             e.printStackTrace()
             return null
         }
@@ -75,11 +75,11 @@ class TCPLog(port:Int , filePath:String) {
                 fileStream = FileInputStream(File(filePath))
                 pw = PrintWriter(outputStream , true)
 
-                /*
+
                 fileStream!!.available().let {
                     fileStream?.channel?.position(it.toLong())
                 }
-                */
+
                 start()
             }catch (e:Exception){
                 e.printStackTrace()

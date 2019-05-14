@@ -35,7 +35,6 @@ class MissionPanel : Fragment() {
     private val minGimbalPitch = -90
 
     private val latlngGap = 0.00001
-    private val altitudeGap = 0.1
 
     var missionListAdapter: MissionAdapter by Delegates.notNull()
 
@@ -44,20 +43,18 @@ class MissionPanel : Fragment() {
     var onSpacingChanged: ((Int) -> Unit)? = null
     var onSpeedChanged: ((Int) -> Unit)? = null
     var onAltitudeChanged: ((Int) -> Unit)? = null
-    var onGimbalPitchChanged:((Int) -> Unit) ?= null
-    var onShootTimeIntervalChanged:((Int) -> Unit)? = null
-    var onAltitudeOverall:((Boolean) -> Unit)?=null
-    var onSpeedOverall:((Boolean) -> Unit)?=null
-    var onGimbalOverall:((Boolean) -> Unit)?=null
-    var onShootTimeIntervalOverall:((Boolean) -> Unit)?=null
-    var onATHChanged:((Boolean) -> Unit)?=null
+    var onGimbalPitchChanged: ((Int) -> Unit)? = null
+    var onShootTimeIntervalChanged: ((Int) -> Unit)? = null
+    var onSwitchShootTimeIntervalChanged:((Boolean) -> Unit)?=null
+    var onATHChanged: ((Boolean) -> Unit)? = null
 
-    var onItemShootTimeIntervalChanged:((Int) -> Unit)?=null
-    var onItemSpeedChanged:((Int) -> Unit)?=null
-    var onItemAltitudeChanged:((Int) -> Unit)?=null
-    var onItemGimbalPitchChanged:((Int) -> Unit)?=null
-    var onItemLatLngChanged:((LocationCoordinate2D) -> Unit)?=null
 
+    var onItemShootTimeIntervalChanged: ((Int) -> Unit)? = null
+    var onSwitchItemShootTimeIntervalChanged:((Boolean) -> Unit)?=null
+    var onItemSpeedChanged: ((Int) -> Unit)? = null
+    var onItemAltitudeChanged: ((Int) -> Unit)? = null
+    var onItemGimbalPitchChanged: ((Int) -> Unit)? = null
+    var onItemLatLngChanged: ((LocationCoordinate2D) -> Unit)? = null
 
     var onCreateMission: ((MissionPanel, MapMissionController.ControlType) -> Unit)? = null
     var onSelectMission: ((MissionPanel, Mission) -> Unit)? = null
@@ -72,7 +69,7 @@ class MissionPanel : Fragment() {
 
     private var missionType: MapMissionController.ControlType = MapMissionController.ControlType.Area
 
-    private val seekbarChangeListener = object:SeekBar.OnSeekBarChangeListener{
+    private val seekbarChangeListener = object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
             when (seekBar) {
                 seekbarSpacing -> {
@@ -95,27 +92,27 @@ class MissionPanel : Fragment() {
 
                 seekbarGimbalPitch -> {
                     val gimbalPitch = progress + minGimbalPitch
-                    textGimbalPitch.text = activity?.getString(R.string.mission_gimbalPitch,gimbalPitch.toString())
+                    textGimbalPitch.text = activity?.getString(R.string.mission_gimbalPitch, gimbalPitch.toString())
                     onGimbalPitchChanged?.invoke(gimbalPitch)
                 }
 
-                seekbarShootTimeInterval->{
+                seekbarShootTimeInterval -> {
                     val shootTimeInterval = progress + minShootTimeInterval
 
-                    textShootTimeInterval.text = activity?.getString(R.string.mission_timeInterval , shootTimeInterval.toString())
+                    textShootTimeInterval.text = activity?.getString(R.string.mission_timeInterval, shootTimeInterval.toString())
                     onShootTimeIntervalChanged?.invoke(shootTimeInterval)
                 }
 
                 seekbarItemGimbalPitch -> {
                     val gimbalPitch = progress + minGimbalPitch
-                    textItemGimbalPitch.text = activity?.getString(R.string.mission_gimbalPitch,gimbalPitch.toString())
+                    textItemGimbalPitch.text = activity?.getString(R.string.mission_gimbalPitch, gimbalPitch.toString())
                     onItemGimbalPitchChanged?.invoke(gimbalPitch)
                 }
 
-                seekbarItemShootTimeInterval ->{
+                seekbarItemShootTimeInterval -> {
                     val shootTimeInterval = progress + minShootTimeInterval
 
-                    textItemShootTimeInterval.text = activity?.getString(R.string.mission_timeInterval , shootTimeInterval.toString())
+                    textItemShootTimeInterval.text = activity?.getString(R.string.mission_timeInterval, shootTimeInterval.toString())
                     onItemShootTimeIntervalChanged?.invoke(shootTimeInterval)
                 }
 
@@ -125,12 +122,11 @@ class MissionPanel : Fragment() {
                     onItemSpeedChanged?.invoke(speed)
                 }
 
-                seekbarItemAltitude ->{
+                seekbarItemAltitude -> {
                     val altitude = progress + minAltitude
                     textItemAltitude.text = activity?.getString(R.string.mission_altitude, altitude.toString())
                     onItemAltitudeChanged?.invoke(altitude)
                 }
-
 
             }
         }
@@ -144,34 +140,34 @@ class MissionPanel : Fragment() {
         }
     }
 
-    private val btnClickListener = object :View.OnClickListener{
+    private val btnClickListener = object : View.OnClickListener {
         override fun onClick(btn: View?) {
-            when(btn){
-                btnLatSub ->{
+            when (btn) {
+                btnLatSub -> {
                     val lat = editLat.text.toString().toDouble() - latlngGap
                     val lng = editLng.text.toString().toDouble()
                     editLat.setText("$lat")
-                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat,lng))
+                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat, lng))
                 }
-                btnLatAdd ->{
+                btnLatAdd -> {
                     val lat = editLat.text.toString().toDouble() + latlngGap
                     val lng = editLng.text.toString().toDouble()
                     editLat.setText("$lat")
-                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat,lng))
+                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat, lng))
                 }
-                btnLngSub ->{
+                btnLngSub -> {
                     val lat = editLat.text.toString().toDouble()
                     val lng = editLng.text.toString().toDouble() - latlngGap
                     editLng.setText("$lng")
 
-                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat,lng))
+                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat, lng))
                 }
-                btnLngAdd->{
+                btnLngAdd -> {
                     val lat = editLat.text.toString().toDouble()
                     val lng = editLng.text.toString().toDouble() + latlngGap
                     editLng.setText("$lng")
 
-                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat,lng))
+                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat, lng))
                 }
             }
         }
@@ -179,80 +175,58 @@ class MissionPanel : Fragment() {
 
     private val editorActionListener = object : TextView.OnEditorActionListener {
         override fun onEditorAction(textView: TextView?, actionId: Int, event: KeyEvent?): Boolean {
-            when(textView){
-                editLat ->{
+            when (textView) {
+                editLat -> {
                     val lat = editLat.text.toString().toDouble()
                     val lng = editLng.text.toString().toDouble()
-                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat,lng))
+                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat, lng))
                 }
                 editLng -> {
                     val lat = editLat.text.toString().toDouble()
                     val lng = editLng.text.toString().toDouble()
-                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat,lng))
+                    onItemLatLngChanged?.invoke(LocationCoordinate2D(lat, lng))
                 }
             }
             return false
         }
     }
 
-    private val switchCheckedListener = object:CompoundButton.OnCheckedChangeListener{
+    private val switchCheckedListener = object : CompoundButton.OnCheckedChangeListener {
         override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-            when(buttonView){
-                switchAltitude ->{
-                    if(isChecked){
-                        linearAltitude.visibility = View.VISIBLE
-
-                        seekbarItemAltitude.progress = seekbarAltitude.progress
-                        seekbarItemAltitude.isEnabled = false
-                    }else{
-                        linearAltitude.visibility = View.GONE
-                        seekbarItemAltitude.isEnabled = true
-                    }
-                    onAltitudeOverall?.invoke(isChecked)
-                }
-                switchSpeed -> {
-                    if (isChecked){
-                        linearSpeed.visibility = View.VISIBLE
-                        seekbarItemSpeed.progress = seekbarSpeed.progress
-                        seekbarItemSpeed.isEnabled = false
-                    }else{
-                        linearSpeed.visibility = View.GONE
-                        seekbarItemSpeed.isEnabled = true
-                    }
-                    onSpeedOverall?.invoke(isChecked)
-                }
-                switchGimbalPitch -> {
-                    if(isChecked){
-                        linearGimbalPitch.visibility = View.VISIBLE
-                        seekbarItemGimbalPitch.progress = seekbarGimbalPitch.progress
-                        seekbarItemGimbalPitch.isEnabled = false
-
-                    }else{
-                        linearGimbalPitch.visibility = View.GONE
-                        seekbarItemGimbalPitch.isEnabled = true
-                    }
-                    onGimbalOverall?.invoke(isChecked)
-                }
-                switchShootTimeInterval -> {
-                    if(isChecked){
-                        linearShootTimeInterval.visibility = View.VISIBLE
-                        seekbarItemShootTimeInterval.progress = seekbarItemShootTimeInterval.progress
-                        seekbarItemShootTimeInterval.isEnabled = false
-                    }else{
-                        linearShootTimeInterval.visibility = View.GONE
-                        seekbarItemShootTimeInterval.isEnabled = true
-                    }
-                }
-                switchATH ->{
+            when (buttonView) {
+                switchATH -> {
                     onATHChanged?.invoke(isChecked)
+                }
+
+                switchShootTimeInterval ->{
+                    onSwitchShootTimeIntervalChanged?.invoke(isChecked)
+                    if(isChecked){
+
+                        linearShootTimeInterval.visibility = View.VISIBLE
+                    }else{
+                        textShootTimeInterval.setText(activity?.getString(R.string.mission_timeInterval_close))
+                        linearShootTimeInterval.visibility = View.GONE
+                    }
+                }
+
+                switchItemShootTimeInterval->{
+                    onSwitchItemShootTimeIntervalChanged?.invoke(isChecked)
+                    if(isChecked){
+
+                        linearItemShootTimeInterval.visibility = View.VISIBLE
+                    }else{
+                        textItemShootTimeInterval.setText(activity?.getString(R.string.mission_timeInterval_close))
+                        linearItemShootTimeInterval.visibility = View.GONE
+                    }
                 }
 
             }
         }
     }
+
     //region Life-cycle
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return View.inflate(activity , R.layout.fragment_mission, null)
+        return View.inflate(activity, R.layout.fragment_mission, null)
     }
 
 
@@ -266,12 +240,12 @@ class MissionPanel : Fragment() {
         binder.clear()
     }
 
-    private fun init(){
+    private fun init() {
 
         btnBack.setOnClickListener {
-            if(linearItem.visibility == View.VISIBLE){
+            if (linearItem.visibility == View.VISIBLE) {
                 showDetail()
-            }else if(linearOverall.visibility == View.VISIBLE) {
+            } else if (linearOverall.visibility == View.VISIBLE) {
                 showList()
             }
             onBackPressed?.invoke()
@@ -333,12 +307,9 @@ class MissionPanel : Fragment() {
         btnLngSub.setOnClickListener(btnClickListener)
         btnLngAdd.setOnClickListener(btnClickListener)
 
-        switchAltitude.setOnCheckedChangeListener(switchCheckedListener)
-        switchSpeed.setOnCheckedChangeListener(switchCheckedListener)
-        switchGimbalPitch.setOnCheckedChangeListener(switchCheckedListener)
-        switchShootTimeInterval.setOnCheckedChangeListener(switchCheckedListener)
         switchATH.setOnCheckedChangeListener(switchCheckedListener)
-
+        switchShootTimeInterval.setOnCheckedChangeListener(switchCheckedListener)
+        switchItemShootTimeInterval.setOnCheckedChangeListener(switchCheckedListener)
 
         editLat.setOnEditorActionListener(editorActionListener)
         editLng.setOnEditorActionListener(editorActionListener)
@@ -384,6 +355,7 @@ class MissionPanel : Fragment() {
                 btnPause.visibility = View.GONE
                 btnCancel.visibility = View.GONE
                 btnResume.visibility = View.GONE
+                btnBack.isEnabled = true
             }
             MissionState.ReadyToExecuting -> {
                 btnUpload.visibility = View.GONE
@@ -405,6 +377,7 @@ class MissionPanel : Fragment() {
                 btnPause.visibility = View.VISIBLE
                 btnCancel.visibility = View.GONE
                 btnResume.visibility = View.GONE
+                btnBack.isEnabled = false
             }
             MissionState.Paused -> {
                 btnUpload.visibility = View.GONE
@@ -414,6 +387,14 @@ class MissionPanel : Fragment() {
                 btnResume.visibility = View.VISIBLE
 
                 btnDelete.isEnabled = true
+                btnBack.isEnabled = true
+            }
+            MissionState.Finish ->{
+                btnUpload.visibility = View.VISIBLE
+                btnStart.visibility = View.GONE
+                btnPause.visibility = View.GONE
+                btnCancel.visibility = View.GONE
+                btnResume.visibility = View.GONE
                 btnBack.isEnabled = true
             }
             else -> {
@@ -443,31 +424,35 @@ class MissionPanel : Fragment() {
     }
 
     private fun showList() {
+        //logMethod(this)
         textTitle.visibility = View.VISIBLE
         btnBack.visibility = View.GONE
         btnAdd.visibility = View.VISIBLE
         btnDelete.visibility = View.GONE
         listViewMission.visibility = View.VISIBLE
+        layoutTitle.visibility = View.VISIBLE
         linearOverall.visibility = View.GONE
         linearItem.visibility = View.GONE
 
     }
 
     fun showDetail() {
+        //logMethod(this)
         textTitle.visibility = View.GONE
         btnBack.visibility = View.VISIBLE
         btnAdd.visibility = View.GONE
         btnDelete.visibility = View.VISIBLE
         listViewMission.visibility = View.GONE
+        layoutTitle.visibility = View.VISIBLE
         linearOverall.visibility = View.VISIBLE
         linearItem.visibility = View.GONE
         seekbarSpacing.isEnabled = missionType != MapMissionController.ControlType.Path
 
-        if(missionType == MapMissionController.ControlType.Path){
+        if (missionType == MapMissionController.ControlType.Path) {
             textSpacing.visibility = View.GONE
             linearSpacing.visibility = View.GONE
 
-        }else{
+        } else {
             textSpacing.visibility = View.VISIBLE
             linearSpacing.visibility = View.VISIBLE
             linearSpeed.visibility = View.VISIBLE
@@ -477,11 +462,13 @@ class MissionPanel : Fragment() {
         }
     }
 
-    fun showItem(){
+    fun showItem() {
+        //logMethod(this)
         textTitle.visibility = View.GONE
         btnBack.visibility = View.VISIBLE
         btnAdd.visibility = View.GONE
         btnDelete.visibility = View.VISIBLE
+        layoutTitle.visibility = View.GONE
         listViewMission.visibility = View.GONE
         linearOverall.visibility = View.GONE
         linearItem.visibility = View.VISIBLE
@@ -493,8 +480,8 @@ class MissionPanel : Fragment() {
                     dialog.dismiss()
                     when (i) {
                         0 -> {
-                            if(onCreateMission == null){
-                                log(this , "onCreateMission is null")
+                            if (onCreateMission == null) {
+                                log(this, "onCreateMission is null")
                             }
                             onCreateMission?.invoke(this, MapMissionController.ControlType.Area)
                             missionType = MapMissionController.ControlType.Area
@@ -512,6 +499,8 @@ class MissionPanel : Fragment() {
                 .show()
     }
 
+
+
     inner class MissionAdapter(val context: Context?) : BaseAdapter() {
 
         var missions = listOf<Mission>()
@@ -521,12 +510,13 @@ class MissionPanel : Fragment() {
         override fun getView(i: Int, view: View?, parent: ViewGroup): View {
             val mission = missions[i]
 
-            val contentView: View = view ?: LayoutInflater.from(context).inflate(R.layout.item_mission, parent, false)
+            val contentView: View = view
+                    ?: LayoutInflater.from(context).inflate(R.layout.item_mission, parent, false)
             contentView.tag = contentView.tag ?: MissionViewHolder(contentView)
 
             val holder = contentView.tag as MissionViewHolder
             holder.title.text = mission.address
-            holder.subtitle.text = getFormatTime(mission.createdAt)
+            holder.subtitle.text = getFormatTime(mission.createdTime)
             holder.click.tag = mission
             holder.click.setOnClickListener(missionClick)
 
