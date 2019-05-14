@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.kaisavx.AircraftController.R
-import com.kaisavx.AircraftController.activity.BaseActivity
 import kotlinx.android.synthetic.main.activity_text.*
 
 /**

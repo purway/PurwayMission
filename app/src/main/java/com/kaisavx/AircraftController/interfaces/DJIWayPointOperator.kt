@@ -3,6 +3,7 @@ package com.kaisavx.AircraftController.interfaces
 import com.amap.api.maps.model.LatLng
 import com.kaisavx.AircraftController.service.Mission
 import com.kaisavx.AircraftController.service.MissionState
+import com.kaisavx.AircraftController.util.DJIErrorTranslation
 import com.kaisavx.AircraftController.util.gcj02towgs84
 import com.kaisavx.AircraftController.util.log
 import dji.common.error.DJIError
@@ -43,9 +44,10 @@ class DJIWayPointOperator : WayPointOperator {
             log(this, "load mission")
 
             val loadError = op.loadMission(toDJIMission(mission))
+
             if (loadError != null) {
-                log(this, "load mission failed")
-                errorSubject.onNext("加载飞行任务失败: $loadError")
+                log(this, "load mission failed:${loadError}")
+                errorSubject.onNext("加载飞行任务失败: ${DJIErrorTranslation.translate(loadError)}")
             } else {
                 log(this, "uploading mission")
                 op.uploadMission(callback)
@@ -63,7 +65,7 @@ class DJIWayPointOperator : WayPointOperator {
         getDJIOperator()?.stopMission { error ->
             if (error != null) {
                 log(this, "stop mission error: ${error.description}")
-                errorSubject.onNext("停止飞行任务失败: $error")
+                errorSubject.onNext("停止飞行任务失败: ${DJIErrorTranslation.translate(error)}")
             }
         }
     }
@@ -73,7 +75,7 @@ class DJIWayPointOperator : WayPointOperator {
         getDJIOperator()?.pauseMission { error ->
             if (error != null) {
                 log(this, "pause mission error: ${error.description}")
-                errorSubject.onNext("暂停飞行任务失败: $error")
+                errorSubject.onNext("暂停飞行任务失败: ${DJIErrorTranslation.translate(error)}")
             }
         }
     }
@@ -83,7 +85,7 @@ class DJIWayPointOperator : WayPointOperator {
         getDJIOperator()?.resumeMission { error ->
             if (error != null) {
                 log(this, "resume mission error: ${error.description}")
-                errorSubject.onNext("恢复飞行任务失败: $error")
+                errorSubject.onNext("恢复飞行任务失败: ${DJIErrorTranslation.translate(error)}")
             }
         }
     }
@@ -91,10 +93,12 @@ class DJIWayPointOperator : WayPointOperator {
     private val listener = object : WaypointMissionOperatorListener {
         override fun onExecutionFinish(error: DJIError?) {
             log(this, "onExecutionFinish ${error?.description}")
-            stateSubject.onNext(MissionState.None)
+            stateSubject.onNext(MissionState.Finish)
 
-            if (error != null) {
-                errorSubject.onNext(error.description)
+            if (error != null ) {
+                log(this ,"execution finish error:${error.description}")
+                //if(error != DJIError.COMMON_EXECUTION_FAILED)
+                    errorSubject.onNext("执行结束错误：${DJIErrorTranslation.translate(error)}")
             }
         }
 
@@ -123,14 +127,17 @@ class DJIWayPointOperator : WayPointOperator {
             val error = event.error
             if (error != null) {
                 log(this, "on upload update error: $error")
-                errorSubject.onNext(error.description)
+                //if(error != DJIError.COMMON_EXECUTION_FAILED)
+                    errorSubject.onNext("上传更新错误：${DJIErrorTranslation.translate(error)}")
             }
         }
 
         override fun onDownloadUpdate(event: WaypointMissionDownloadEvent) {
             val error = event.error
             if (error != null) {
-                errorSubject.onNext(error.description)
+                log(this , "on download update error:$error")
+                //if(error != DJIError.COMMON_EXECUTION_FAILED)
+                    errorSubject.onNext("下载更新错误:${DJIErrorTranslation.translate(error)}")
             }
         }
 
@@ -139,7 +146,9 @@ class DJIWayPointOperator : WayPointOperator {
 
             val error = event.error
             if (error != null) {
-                errorSubject.onNext(error.description)
+                log(this ,"on execution update error:$error")
+                //if(error != DJIError.COMMON_EXECUTION_FAILED)
+                    errorSubject.onNext("执行更新错误：${DJIErrorTranslation.translate(error)}")
             }
             when (event.currentState) {
                 WaypointMissionState.READY_TO_UPLOAD -> stateSubject.onNext(MissionState.None)
@@ -159,7 +168,7 @@ class DJIWayPointOperator : WayPointOperator {
             log(this, "get dji operator $operator")
 
             if (djiOperator == null) {
-                errorSubject.onNext("dji operator init failed")
+                errorSubject.onNext("dji operator 模块初始化失败")
                 log(this, "dji operator init failed")
             } else {
                 djiOperator.addListener(listener)
@@ -174,16 +183,16 @@ class DJIWayPointOperator : WayPointOperator {
     private fun toDJIMission(mission: Mission): WaypointMission {
         val building = WaypointMission.Builder()
                 .autoFlightSpeed(mission.speed)
-                .finishedAction(mission.finishedAction)
+                .finishedAction(WaypointMissionFinishedAction.find(mission.finishedAction))
                 .gotoFirstWaypointMode(WaypointMissionGotoWaypointMode.SAFELY)
                 .setGimbalPitchRotationEnabled(true)
                 .flightPathMode(WaypointMissionFlightPathMode.NORMAL)
                 .headingMode(WaypointMissionHeadingMode.AUTO)
                 .maxFlightSpeed(15f)
 
-        var lastWayPoint = mission.wayPoints[0]
+        var lastWayPoint = mission.wayPointList[0]
 
-        mission.wayPoints.forEach {
+        mission.wayPointList.forEach {
 
             if (lastWayPoint.altitude != it.altitude) {
                 val wgs84Point = gcj02towgs84(LatLng(lastWayPoint.coordinate.latitude, lastWayPoint.coordinate.longitude))
@@ -211,10 +220,12 @@ class DJIWayPointOperator : WayPointOperator {
             waypoint.shootPhotoDistanceInterval = it.shootPhotoDistanceInterval
             building.addWaypoint(waypoint)
             lastWayPoint = it
+            log(this , "WayPointMission shootPhotoTimeInterval:${it.shootPhotoTimeInterval}")
 
         }
 
         val wayPointMission = building.build()
+        log(this , "WayPointMission finishAction:${wayPointMission.finishedAction}")
         val error = wayPointMission.checkParameters()
         if (error != null) {
         }

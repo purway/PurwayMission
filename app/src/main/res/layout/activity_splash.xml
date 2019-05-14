@@ -7,20 +7,10 @@
     android:paddingLeft="0dip"
     android:paddingRight="0dip"
     android:paddingTop="0dip"
-    tools:context="com.aiframe.controller.Activity.MainActivity"
     android:background="@color/white" >
 
-   
-    
-    <SurfaceView 
-        android:id="@+id/surfaceView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        />
-    
      <ImageView 
-        android:id="@+id/image"
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"

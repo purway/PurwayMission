@@ -1,11 +1,10 @@
-package com.szylkb.jellyfish.view.activity
+package com.kaisavx.AircraftController.activity
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.webkit.WebView
-import kotterknife.bindView
-import com.szylkb.jellyfish.R
+import com.kaisavx.AircraftController.R
+import kotlinx.android.synthetic.main.activity_web.*
 
 /**
  * Created by Abner on 2017/6/12.
@@ -20,8 +19,6 @@ class WebActivity: BaseActivity() {
             return intent
         }
     }
-
-    val webView: WebView by bindView(R.id.web)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

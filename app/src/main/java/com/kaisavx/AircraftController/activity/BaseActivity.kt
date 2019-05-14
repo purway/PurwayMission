@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.support.v4.app.NavUtils
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.view.Window
+import android.view.WindowManager
+import com.kaisavx.AircraftController.R
 
 abstract class BaseActivity : AppCompatActivity() {
 
@@ -17,7 +20,20 @@ abstract class BaseActivity : AppCompatActivity() {
     private var loadingDialog: Dialog? = null
     private var isLoading: Boolean = false
 
+    val waitDialog by lazy {
+        //log(this , "waitDialog create:$this")
+        val dialog = ProgressDialog(this)
+        dialog.setMessage(resources.getString(R.string.msg_waitting))
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN)
         super.onCreate(savedInstanceState)
 
         val name = NavUtils.getParentActivityName(this)

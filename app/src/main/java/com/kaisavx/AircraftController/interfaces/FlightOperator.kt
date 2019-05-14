@@ -21,6 +21,7 @@ interface FlightOperator {
 //Home
     fun startGoHome()
     fun cancelGoHome()
+
     fun setHomeLocation()
     fun getHomeLocation(callback: CommonCallbacks.CompletionCallbackWith<LocationCoordinate2D>)
 
