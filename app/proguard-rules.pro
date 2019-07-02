@@ -154,19 +154,7 @@
 -keep class com.amap.api.location.**{*;}
 -keep class com.aps.**{*;}
 
-#lite
--keep class com.tencent.** { *; }
-
 #bugly
 -dontwarn com.tencent.bugly.**
 -keep public class com.tencent.bugly.**{*;}
 
-#im
--keep class com.tencent.**{*;}
--dontwarn com.tencent.**
-
--keep class tencent.**{*;}
--dontwarn tencent.**
-
--keep class qalsdk.**{*;}
--dontwarn qalsdk.**

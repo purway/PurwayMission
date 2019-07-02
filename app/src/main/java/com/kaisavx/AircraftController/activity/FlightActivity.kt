@@ -22,16 +22,16 @@ import com.kaisavx.AircraftController.BuildConfig
 import com.kaisavx.AircraftController.R
 import com.kaisavx.AircraftController.interfaces.DJIFlightOperator
 import com.kaisavx.AircraftController.interfaces.DJIWayPointOperator
-import com.kaisavx.AircraftController.mamager.DJIManager2
-import com.kaisavx.AircraftController.model.*
+import com.kaisavx.AircraftController.model.AircraftStatusRecord
+import com.kaisavx.AircraftController.model.Permission
+import com.kaisavx.AircraftController.model.RequestWithUserId
+import com.kaisavx.AircraftController.model.User
 import com.kaisavx.AircraftController.processor.FlyRecordProcessor
 import com.kaisavx.AircraftController.service.MissionService
 import com.kaisavx.AircraftController.util.*
 import com.kaisavx.AircraftController.view.MissionPanel
 import com.kaisavx.AircraftController.viewmodel.MissionViewModel
-import dji.common.camera.SettingsDefinitions
 import dji.common.flightcontroller.ConnectionFailSafeBehavior
-import dji.common.flightcontroller.GPSSignalLevel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_flight.*
@@ -274,12 +274,6 @@ class FlightActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         logMethod(this)
 
-        DJIManager2.getCameraInstance()?.setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO, {
-            if (it == null) {
-            } else {
-                log(this, "camera setMode Error:${it.description}")
-            }
-        })
 
     }
 
@@ -336,12 +330,7 @@ class FlightActivity : BaseActivity() {
         }
 
         btnMediaManager.setOnClickListener {
-            if(DJIManager2.getMediaManagerInstance() ==null){
-                commandDialog.showError(resources.getString(R.string.msg_aircraft_unlink))
-            }else {
-                val intent = Intent(this, MediaActivity::class.java)
-                startActivityForResult(intent, REQUEST_CODE)
-            }
+
         }
 
         textureView.alpha = 0.0f
@@ -358,17 +347,6 @@ class FlightActivity : BaseActivity() {
         //initSetting()
 
         initAircraftoption()
-        btnDisable.setOnClickListener {
-            DJIManager2.getFlightControllerInstance()?.setVirtualStickModeEnabled(false, {
-                if (it != null) {
-                    log(this, "setVirtualStickModeEnabled:${it.description}")
-                } else {
-                }
-            })
-        }
-
-        btnDisconnect.setOnClickListener {
-        }
 
     }
 
@@ -518,25 +496,6 @@ class FlightActivity : BaseActivity() {
 
         swrPush.setOnCheckedChangeListener { buttonView, isChecked ->
 
-            if (isChecked) {
-                val controller = DJIManager2.getFlightControllerInstance()
-
-                if(controller == null){
-                    commandDialog.showError(resources.getString(R.string.msg_aircraft_unlink))
-                    swrPush.isChecked = false
-                    return@setOnCheckedChangeListener
-                }
-                val userId = Share.getUserId(this)
-                val userPasword = Share.getUserPassword(this)
-                if (userId != null && userPasword != null) {
-                    commandDialog.setWaitShow(true)
-                    val requsetWithUserId = RequestWithUserId(User(userId, null, userPasword))
-                }else{
-                    commandDialog.showError(resources.getString(R.string.msg_user_unlogin))
-                }
-
-            } else {
-            }
         }
 
         val swrVideoData = popupAircraftView.findViewById<Switch>(R.id.swrVideoData)
@@ -568,147 +527,6 @@ class FlightActivity : BaseActivity() {
 
     private fun initDisposable() {
 
-        disposable.add(DJIManager2.isConnectedSubject
-                .distinctUntilChanged()
-                .subscribe {
-                    if (it) {
-
-                        //changeCamera()
-                    } else {
-                        connectingTimer?.cancel()
-                        connectingTimer = null
-
-                        val userId = Share.getUserId(this)
-                        val userPasword = Share.getUserPassword(this)
-                        if (userId != null && userPasword != null) {
-                            val requsetWithUserId = RequestWithUserId(User(userId, null, userPasword))
-                            DJIManager2.aircraftNoSubject.value?.let {
-                                userId?.let { id ->
-                                    val aircraftData = AircraftData(aircraftId, it, it, id, false)
-                                    requsetWithUserId.aircraft = aircraftData
-
-                                    updateAircraftStatus(AircraftStatusRecord.STATUS.DISCONNECTED.value, "$it disconnected")
-                                }
-                            }
-                        }
-                    }
-                })
-
-        disposable.add(DJIManager2.flightStateSubject
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { state ->
-                    pathDrawer.setFlightAngle(-state.aircraftHeadDirection.toFloat())
-                    state.aircraftLocation?.let {
-                        val wgs = wgs84togcj02(LatLng(it.latitude, it.longitude))
-                        //log(this, "wgs:$wgs")
-
-                        if (state.gpsSignalLevel != GPSSignalLevel.LEVEL_0 &&
-                                state.gpsSignalLevel != GPSSignalLevel.LEVEL_1 /*&&
-                                    state.gpsSignalLevel != GPSSignalLevel.LEVEL_2*/) {
-
-                            var isEdit = false
-                            missionViewModel?.isEditingSubject?.value?.let {
-                                isEdit = it
-                            }
-                            pathDrawer.setFlightMarker(wgs, state.isFlying && !isEdit)
-
-                            if (isSetup) {
-                                isSetup = false
-                                mapWidget.map.animateCamera(CameraUpdateFactory.newLatLngZoom(wgs, 19f))
-                            }
-
-                            if (state.isHomeLocationSet) {
-                                state.homeLocation?.let {
-                                    val wgs = wgs84togcj02(LatLng(it.latitude, it.longitude))
-                                    pathDrawer.setHomeMaker(wgs)
-
-                                    //log(this , "home location:$wgs")
-                                }
-                            }
-                        }
-                    }
-
-                    if (state.isFlying && !state.isGoingHome && state.isLowerThanBatteryWarningThreshold) {
-                        log(this, "low battery go home")
-
-                    }
-                    //log(this , "Ultrasonic:${state.isUltrasonicBeingUsed} ${state.ultrasonicHeightInMeters}")
-                })
-
-        disposable.add(DJIManager2.isFlyingSubject
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    /*
-                    if (it) {
-                    } else {
-                        flightOperator.stateSubject.onNext(DJIFlightOperator.FlightState.NONE)
-                        if (missionViewModel?.isFlying == true) {
-                            val permission = Permission(Share.getPermission(this))
-
-                            val flag = permission.isMediaUpload() && Share.getIsMediaUpload(this)
-                            DJIManager2.getFileList(flag)
-                        }
-                    }
-
-                    missionViewModel?.isFlying = it
-*/
-                })
-
-        disposable.add(DJIManager2.isLandingNeedSubject
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    if (it) {
-                        flightOperator.stateSubject.onNext(DJIFlightOperator.FlightState.LANDING_CONFIRM)
-                    }
-                })
-
-        disposable.add(DJIManager2.isCameraInitSubject
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    log(this, "isCameraInitSubject:$it")
-                    /*
-                    if (it) {
-                        loadingDialog.show()
-                    } else {
-                        loadingDialog.dismiss()
-                        DJIManager2.getCameraInstance()?.setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO, {
-                            if (it == null) {
-                                log(this, "setCameraMode:success")
-                            } else {
-                                log(this, "camera setMode Error:${it.description}")
-                            }
-
-                        })
-                    }
-                    */
-                })
-
-        disposable.add(DJIManager2.aircraftNoSubject
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { no ->
-                    runOnUiThread {
-                        txtPush.setText(no)
-                    }
-                    val userId = Share.getUserId(this)
-                    val userPasword = Share.getUserPassword(this)
-                    if (userId != null && userPasword != null) {
-                        val requsetWithUserId = RequestWithUserId(User(userId, null, userPasword))
-                        userId?.let { id ->
-
-                            val aircraftData = AircraftData(null, no, no, id, true)
-
-                            requsetWithUserId.aircraft = aircraftData
-                            log(this, "updateOrCreateAircraftWithUserId")
-
-
-                        }
-                    }
-                })
-
-
         disposable.add(flyRecordProcessor.flyPointListSubject
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { flyPointList ->
@@ -732,16 +550,6 @@ class FlightActivity : BaseActivity() {
                 val userPasword = Share.getUserPassword(this@FlightActivity)
                 if (userId != null && userPasword != null) {
                     val requestWithUserId = RequestWithUserId(User(userId, null, userPasword))
-                    DJIManager2.aircraftNoSubject.value?.let {
-                        if (aircraftId != null) {
-                            userId?.let { id ->
-                                val aircraftData = AircraftData(aircraftId, it, it, id, true)
-                                requestWithUserId.aircraft = aircraftData
-
-                            }
-
-                        }
-                    }
 
                     if (createdTime < 0) return
 

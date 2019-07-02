@@ -23,7 +23,6 @@ import com.kaisavx.AircraftController.R
 import com.kaisavx.AircraftController.controller.MapMissionController
 import com.kaisavx.AircraftController.controller.WayHolder
 import com.kaisavx.AircraftController.interfaces.DJIFlightOperator
-import com.kaisavx.AircraftController.mamager.DJIManager2
 import com.kaisavx.AircraftController.model.AircraftStatusRecord
 import com.kaisavx.AircraftController.model.RequestWithUserId
 import com.kaisavx.AircraftController.model.User
@@ -82,8 +81,6 @@ class MissionViewModel(
 
     val uploadProgressSubject: BehaviorSubject<Int> = BehaviorSubject.create()
     val uploadMaxSubject: BehaviorSubject<Int> = BehaviorSubject.create()
-    private var fileList = DJIManager2.destDir.absoluteFile.listFiles()
-
     var updateAircraftStatus: ((Int, String?) -> Unit)? = null
 
     var waitDialog: ProgressDialog? = null
@@ -188,28 +185,6 @@ class MissionViewModel(
                     missionPanel.setMissions(it)
                 })
 
-        disposable.add(DJIManager2.downloadProgressSubject
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    if (it < 0) {
-                        updateAircraftStatus?.invoke(AircraftStatusRecord.STATUS.DOWNLOAD_PICTURES.value, "error")
-                        hideDownloadDialog()
-                        uploadFiles()
-                    } else {
-                        updateAircraftStatus?.invoke(AircraftStatusRecord.STATUS.DOWNLOAD_PICTURES.value, "$it")
-                        showDownloadDialog(downloadDialog.max - it)
-                    }
-                }
-        )
-
-        disposable.add(DJIManager2.downloadMaxSubject
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    downloadDialog.max = it
-
-                })
         disposable.add(uploadProgressSubject
                 .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -230,13 +205,6 @@ class MissionViewModel(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     uploadDialog.max = it
-                })
-
-        disposable.add(DJIManager2.errorSubject
-                .distinctUntilChanged()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                 })
 
     }
@@ -984,48 +952,6 @@ class MissionViewModel(
             }
         })
         search.getFromLocationAsyn(RegeocodeQuery(LatLonPoint(mission.addressLatitude, mission.addressLongitude), 100f, GeocodeSearch.AMAP))
-    }
-
-    fun uploadFiles() {
-        fileList = DJIManager2.destDir.absoluteFile.listFiles()
-        val fileIndex = fileList.size
-
-        log(this, "fileList:")
-        fileList.forEach {
-            if (it.isFile) {
-                log(this, "file:${it.name}")
-            }
-        }
-        uploadMaxSubject.onNext(fileList.size)
-
-        uploadProgressSubject.onNext(fileList.size)
-
-        uploadFileByIndex(fileList.size - 1)
-    }
-
-    private fun uploadFileByIndex(index: Int) {
-
-        if (index >= fileList.size) {
-            uploadProgressSubject.onNext(-1)
-            return
-        }
-
-        if (index < 0) {
-            uploadProgressSubject.onNext(-1)
-            return
-        }
-
-
-    }
-
-    private fun showDownloadDialog(progress: Int) {
-        if (!downloadDialog.isShowing) {
-            downloadDialog.incrementProgressBy(-downloadDialog.progress)
-            downloadDialog.show()
-        }
-        downloadDialog.progress = progress
-
-
     }
 
     private fun hideDownloadDialog() {
