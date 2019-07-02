@@ -52,12 +52,15 @@ android {
         doNotStrip "*/*/libFRCorkscrew.so"
         doNotStrip "*/*/libUpgradeVerify.so"
         doNotStrip "*/*/libFR.so"
+        doNotStrip "*/*/libDJIFlySafeCore.so"
+        doNotStrip "*/*/libdjifs_jni.so"
+        doNotStrip "*/*/libsfjni.so"
+
 
         exclude 'META-INF/rxjava.properties'
     }
     dexOptions {
-        javaMaxHeapSize "4g"
-    }
+        javaMaxHeapSize "4g"    }
 }
 
 dependencies {
@@ -89,13 +92,17 @@ dependencies {
     implementation 'org.jetbrains.anko:anko-appcompat-v7:latest.release'
     //okhttp
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'com.squareup:otto:1.3.8'
     //rxjava
     implementation 'io.reactivex.rxjava2:rxandroid:latest.release'
     implementation 'io.reactivex.rxjava2:rxjava:latest.release'
 
     //dji
     implementation 'com.dji:dji-uxsdk:latest.release'
-    implementation 'com.dji:dji-sdk:latest.release'
+    implementation ('com.dji:dji-sdk:latest.release',{
+        exclude module:'library-anti-distortion'
+        exclude module:'library-networkrtk-helper'
+    })
     compileOnly 'com.dji:dji-sdk-provided:latest.release'
 
     //gaode map

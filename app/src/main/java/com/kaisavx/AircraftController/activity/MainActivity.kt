@@ -2,24 +2,35 @@ package com.kaisavx.AircraftController.activity
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.IBinder
+import android.provider.Settings
 import android.view.*
 import android.view.Menu
 import android.widget.*
+import com.kaisavx.AircraftController.BuildConfig
 import com.kaisavx.AircraftController.R
 import com.kaisavx.AircraftController.adapter.SettingAdapter
 import com.kaisavx.AircraftController.dialog.DetailAlterDialog
 import com.kaisavx.AircraftController.dialog.ProductDialog
 import com.kaisavx.AircraftController.dialog.UserActivationDialog
 import com.kaisavx.AircraftController.dialog.UserDetailDialog
-import com.kaisavx.AircraftController.mamager.DJIManager2
+import com.kaisavx.AircraftController.fragment.ConnectFragment
+import com.kaisavx.AircraftController.fragment.LogFragment
+import com.kaisavx.AircraftController.module.dji.DJIAccountManager
+import com.kaisavx.AircraftController.module.dji.DJIManager
+import com.kaisavx.AircraftController.service.FlightService
+import com.kaisavx.AircraftController.util.KLog
 import com.kaisavx.AircraftController.util.Share
 import com.kaisavx.AircraftController.util.VersionUtil
-import com.kaisavx.AircraftController.util.log
-import com.kaisavx.AircraftController.util.logMethod
+import com.kaisavx.AircraftController.util.plusAssign
+import dji.common.error.DJIError
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -31,6 +42,9 @@ import kotlin.collections.ArrayList
 
 
 class MainActivity : BaseActivity() {
+    companion object {
+        private val TAG = "MainActivity"
+    }
 
     private val disposable = CompositeDisposable()
 
@@ -86,6 +100,8 @@ class MainActivity : BaseActivity() {
         popupWindow
     }
 
+    private val djiAccountManager = DJIAccountManager()
+
     private val showLoginDialog by lazy {
         AlertDialog.Builder(this)
                 .setMessage(R.string.msg_must_login_error)
@@ -96,6 +112,16 @@ class MainActivity : BaseActivity() {
                 .setNegativeButton(R.string.btn_cancel, { dialogInterface, i ->
                     dialogInterface.dismiss()
                 })
+                .create()
+    }
+    private val networkErrorDialog by lazy {
+        AlertDialog.Builder(this)
+                .setMessage(R.string.msg_network_error)
+                .setPositiveButton(R.string.btn_open, { dialog, which ->
+                    dialog.dismiss()
+                    startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+                })
+                .setNegativeButton(R.string.btn_cancel, null)
                 .create()
     }
 
@@ -118,7 +144,7 @@ class MainActivity : BaseActivity() {
     private val userDetialDialog by lazy {
         UserDetailDialog.Builder(this)
                 .setTitle(R.string.dialog_user_detail_title)
-                .setOnAlterDetailClickListener{
+                .setOnAlterDetailClickListener {
                     showAlterDialog()
                 }
                 /*
@@ -171,59 +197,86 @@ class MainActivity : BaseActivity() {
     private val djiRegisterDialog by lazy {
         AlertDialog.Builder(this)
                 .setTitle(R.string.alert_register_failed)
-                .setNegativeButton(R.string.btn_sure, { dialog, which ->
+                .setPositiveButton(R.string.btn_open, { dialog, which ->
                     dialog.dismiss()
+                    startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
                 })
+                .setNegativeButton(R.string.btn_cancel, null)
                 .create()
+    }
+
+    private val fgmLog by lazy {
+        supportFragmentManager.findFragmentById(R.id.fgmLog) as LogFragment
+    }
+    private val fgmConnect by lazy{
+        supportFragmentManager.findFragmentById(R.id.fmgConnect) as ConnectFragment
+    }
+
+    private var djiManager: DJIManager? = null
+
+    private val flightConnection = object : ServiceConnection {
+        override fun onServiceConnected(className: ComponentName, binder: IBinder) {
+            val service = (binder as FlightService.LocalBinder).service
+            setupDJIManager(service.djiManager)
+        }
+
+        override fun onServiceDisconnected(className: ComponentName) {
+
+        }
     }
 
     //region Life-cycle
     override fun onCreate(savedInstanceState: Bundle?) {
+        KLog.i( TAG, "onCreate")
         super.onCreate(savedInstanceState)
 
-        logMethod(this)
         setContentView(R.layout.activity_main)
 
-        DJIManager2.checkAndRequestPermissions(this)
-        initView()
-        initDisposable()
+        setupView()
+        setupDisposable()
+        setupDJIAccountManager()
 
-        //test()
+        bindService(Intent(this, FlightService::class.java), flightConnection, Context.BIND_AUTO_CREATE)
+
+        if (!BuildConfig.DEBUG) {
+            fgmLog.hide()
+        }
 
     }
 
     override fun onStart() {
+        KLog.i( TAG, "onStart")
         super.onStart()
     }
 
     override fun onResume() {
+        KLog.i( TAG, "onResume")
         super.onResume()
-        logMethod(this)
-
+        checkRegister()
     }
 
     override fun onPause() {
+        KLog.i( TAG, "onPause")
         super.onPause()
-        logMethod(this)
     }
 
     override fun onStop() {
+        KLog.i( TAG, "onStop")
         super.onStop()
-        logMethod(this)
     }
 
     override fun onDestroy() {
+        KLog.i( TAG, "onDestroy")
+        djiAccountManager.destory()
         disposable.clear()
         super.onDestroy()
-        logMethod(this)
-
+        unbindService(flightConnection)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        KLog.i( TAG, "onRequestPermissionsResult")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        logMethod(this)
-
-        DJIManager2.onRequestPermissionsResult(this, requestCode, permissions, grantResults)
+        djiManager?.onRequestPermissionsResult(this, requestCode, permissions, grantResults)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -249,27 +302,26 @@ class MainActivity : BaseActivity() {
         }
 
     }
-
+/*
     override fun onBackPressed() {
-        logMethod(this)
         finish()
     }
-
-    private fun initView() {
+*/
+    private fun setupView() {
         btnFlyNow.setOnClickListener {
             intent = Intent(this, FlightActivity::class.java)
             startActivityOnce(intent)
         }
 
         btnFlyRecord.setOnClickListener {
-            intent = Intent(this , FlyRecordListActivity::class.java)
+            intent = Intent(this, FlyRecordListActivity::class.java)
             startActivityOnce(intent)
         }
 
-        initPopupView()
+        setupPopupView()
     }
 
-    private fun initPopupView() {
+    private fun setupPopupView() {
 
         val layoutUser = popupView.findViewById<ViewGroup>(R.id.layoutUser)
         layoutUser.setOnClickListener {
@@ -335,66 +387,84 @@ class MainActivity : BaseActivity() {
 
     }
 
-    private fun initDisposable() {
+    private fun setupDisposable() {
         disposable.add(waitSubject
                 .observeOn(AndroidSchedulers.mainThread())
                 .distinctUntilChanged()
                 .subscribe {
-                    if(it){
+                    if (it) {
                         waitDialog.show()
-                    }else{
+                    } else {
                         waitDialog.dismiss()
                     }
                 })
+    }
 
-        disposable.add(DJIManager2.isRegisterSubject
-                .observeOn(Schedulers.computation())
-                .distinctUntilChanged()
-                .subscribe {
-                    if (it) {
-                        waitSubject.onNext(true)
-                        DJIManager2.checkLogin()
-                    } else {
-                        djiRegisterDialog.show()
-                    }
-                })
-        disposable.add(DJIManager2.userAccountStateSubject
-                .distinctUntilChanged()
+    private fun setupDJIAccountManager() {
+        disposable += djiAccountManager.accountOb
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    log(this,"userAccountState:$it")
-                    login()
-                })
-        disposable.add(DJIManager2.isConnectedSubject
-                .observeOn(AndroidSchedulers.mainThread())
-                .distinctUntilChanged()
-                .subscribe {
-                    if (it) {
-                        deviceState.setText(R.string.device_connected)
-                        deviceState.setTextColor(Color.GREEN)
-                    } else {
-                        deviceState.setText(R.string.device_disconnect)
-                        deviceState.setTextColor(Color.RED)
-                    }
-                })
-
-        disposable.add(DJIManager2.accountSubject
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    log(this,"account:$it")
+                .subscribe { account ->
                     waitSubject.onNext(false)
-                    showLoginDialog.dismiss()
-                    updateUser(it)
-                })
+                    updateUser(account)
+                }
 
-        disposable.add(DJIManager2.flightControllerSubejct
+        disposable += djiAccountManager.accountStateOb
+                .observeOn(Schedulers.computation())
                 .subscribe {
-                    DJIManager2.configFlightController(this, it)
-                })
+                    login()
+                }
+
+        disposable += djiAccountManager.loginErrorOb
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { error ->
+                    waitSubject.onNext(false)
+                    if (error != null && error == DJIError.NO_NETWORK) {
+                        networkErrorDialog.show()
+                    } else {
+                        showLoginDialog.show()
+                    }
+                }
+
+        disposable += djiAccountManager.showLoginOb
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    waitSubject.onNext(false)
+                    djiAccountManager.showLoginDialog(this)
+                }
 
     }
 
-    private fun showAlterDialog(){
+    private fun setupDJIManager(manager: DJIManager) {
+        djiManager = manager
+        disposable += manager.isRegisterOb
+                .distinctUntilChanged()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (it) {
+                        waitSubject.onNext(true)
+                        djiAccountManager.checkLogin()
+                    } else {
+                        djiRegisterDialog.show()
+                    }
+                }
+        manager.checkAndRequestPermissions(this)
+
+        fgmConnect.setupDJIManager(manager)
+    }
+
+    private fun checkRegister() {
+        djiManager?.let {
+            KLog.i( TAG, "checkRegister")
+            if (!DJIManager.hasRegistered()) {
+                it.checkAndRequestPermissions(this)
+            } else {
+                waitSubject.onNext(true)
+                djiAccountManager.getLoginState()
+            }
+        }
+    }
+
+    private fun showAlterDialog() {
         detailAlterDialog.show()
         val name = Share.getUserName(this)
         val company = Share.getUserCompany(this)
@@ -402,14 +472,14 @@ class MainActivity : BaseActivity() {
         detailAlterDialog.edtCompany.setText(company)
     }
 
-    private fun updateUser(account:String?){
-        Share.setUserAccount(this,account)
-        if(account==null){
+    private fun updateUser(account: String?) {
+        Share.setUserAccount(this, account)
+        if (account == null) {
             textUserName?.text = resources.getString(R.string.user_logout)
             settingList.removeAt(settingList.size - 1)
             settingList.add(loginHashMap)
             settingAdapter.notifyDataSetChanged()
-        }else{
+        } else {
             textUserName?.text = account
             settingList.removeAt(settingList.size - 1)
             settingList.add(logoutHashMap)
@@ -417,18 +487,14 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun login(){
-        DJIManager2.login(this,{
-            runOnUiThread {
-                showLoginDialog.show()
-            }
-        })
+    private fun login() {
+        djiAccountManager.login()
     }
 
     private fun logout() {
+        djiAccountManager.logout()
         runOnUiThread {
             updateUser(null)
         }
-        DJIManager2.logout()
     }
 }

@@ -8,12 +8,13 @@ import com.elvishew.xlog.LogLevel
 import com.elvishew.xlog.XLog
 import com.elvishew.xlog.printer.file.FilePrinter
 import com.elvishew.xlog.printer.file.naming.DateFileNameGenerator
+import com.kaisavx.AircraftController.util.KLog
 import com.kaisavx.AircraftController.util.Log
 import com.kaisavx.AircraftController.util.RealmKit
-import com.kaisavx.AircraftController.util.log
 import com.secneo.sdk.Helper
 import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy
+import io.reactivex.plugins.RxJavaPlugins
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -27,6 +28,7 @@ class App : MultiDexApplication() {
 
     companion object {
         var context: Context by Delegates.notNull()
+        private val TAG = "App"
     }
 
     override fun attachBaseContext(base: Context?) {
@@ -56,8 +58,12 @@ class App : MultiDexApplication() {
         XLog.init(if (BuildConfig.DEBUG) LogLevel.ALL else LogLevel.NONE, filePrinter)
         context = this
 
-        log(this ,"App context:$context")
-        log(this,"----------------------- App Start ----------------------------")
+        RxJavaPlugins.setErrorHandler {
+            KLog.e(TAG,"RxJavaPlugins error:${it.localizedMessage}")
+        }
+
+        KLog.i(TAG ,"App context:$context")
+        KLog.i(TAG,"----------------------- App Start ----------------------------")
     }
 
     override fun onTerminate() {

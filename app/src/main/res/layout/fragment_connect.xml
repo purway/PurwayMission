@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/latRCStatus"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/latRCDisconnect"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/txtRCDisconnect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/rc_disconnect"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/btnRCTips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/txtRCDisconnect"
+                android:background="@android:color/transparent"
+                android:text="@string/btn_tips"
+                android:textColor="@android:color/holo_red_dark" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/latRCConnected"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/txtRCConnected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/rc_connected"
+                android:textSize="20sp" />
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/connected"
+                android:layout_toEndOf="@id/txtRCConnected"
+                android:layout_marginStart="10dp"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/latFlightStatus"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:id="@+id/latFlightDisconnect"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/txtFlightDisconnect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/flight_disconnect"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/btnFlightTips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/txtFlightDisconnect"
+                android:background="@android:color/transparent"
+                android:text="@string/btn_tips"
+                android:textColor="@android:color/holo_red_dark" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/latFlightConnected"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/txtFlightConnected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textSize="20sp" />
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/connected"
+                android:layout_toEndOf="@id/txtFlightConnected"
+                android:layout_marginStart="10dp"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/latDeviceStatus"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/latDeviceConnecting"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtDeviceConnecting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/device_connecting"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/latDeviceDisconnect"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/txtDeviceDisconnect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/device_disconnect"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/btnDeviceTips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/txtDeviceDisconnect"
+                android:background="@android:color/transparent"
+                android:text="@string/btn_tips"
+                android:textColor="@android:color/holo_red_dark" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/latDeviceConnected"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/txtDeviceConnected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textSize="20sp" />
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/connected"
+                android:layout_toEndOf="@id/txtDeviceConnected"
+                android:layout_marginStart="10dp"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

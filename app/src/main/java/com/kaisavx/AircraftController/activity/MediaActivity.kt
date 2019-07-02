@@ -13,12 +13,8 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import com.kaisavx.AircraftController.R
-import com.kaisavx.AircraftController.mamager.DJIManager
 import com.kaisavx.AircraftController.util.logMethod
-import dji.common.camera.SettingsDefinitions
-import dji.common.error.DJICameraError
 import dji.common.error.DJIError
-import dji.common.util.CommonCallbacks
 import dji.sdk.camera.VideoFeeder
 import dji.sdk.codec.DJICodecManager
 import dji.sdk.media.*
@@ -44,9 +40,6 @@ class MediaActivity : BaseActivity() {
 
     private var destDir = File(Environment.getExternalStorageDirectory().path + "/Aircraft/")
 
-    private val djiManager by lazy {
-        DJIManager(this)
-    }
 
     private var codecManager: DJICodecManager? = null
 
@@ -73,39 +66,8 @@ class MediaActivity : BaseActivity() {
                 }
                 btnPlay -> {
 
-                    playStateSubject.value?.playbackStatus?.let {
-                        if (it == MediaFile.VideoPlaybackStatus.PAUSED) {
-                            val mediaManager = djiManager.getMediaManagerInstance()
-                            if (mediaManager != null) {
-                                mediaManager.resume { error ->
-                                    if (null != error) {
-                                        setResultToToast("Resume Video Failed" + error.description)
-                                    } else {
-
-                                    }
-                                }
-                            } else {
-                                errorSubject.onNext(resources.getString(R.string.error_aircraft_disconnect))
-                            }
-                        } else {
-                            playVideo()
-                        }
-                    }
-
                 }
                 btnPause -> {
-                    val mediaManager = djiManager.getMediaManagerInstance()
-
-                    if (mediaManager != null) {
-                        mediaManager.pause { error ->
-                            if (null != error) {
-                                setResultToToast("Pause Video Failed" + error.description)
-                            }
-                        }
-                    } else {
-                        errorSubject.onNext(resources.getString(R.string.error_aircraft_disconnect))
-                    }
-
                 }
             }
         }
@@ -200,14 +162,6 @@ class MediaActivity : BaseActivity() {
         codecManager?.destroyCodec()
         codecManager = null
 
-        djiManager.getMediaManagerInstance()?.let {
-            it.stop(null)
-            it.removeFileListStateCallback(updateFileListStateListener)
-            it.removeMediaUpdatedVideoPlaybackStateListener(updatedVideoPlaybackStateListener)
-            it.exitMediaDownloading()
-
-            it.scheduler?.removeAllTasks()
-        }
     }
 
     override fun onBackPressed() {
@@ -219,18 +173,7 @@ class MediaActivity : BaseActivity() {
             when (playbackStatus) {
                 MediaFile.VideoPlaybackStatus.PLAYING,
                 MediaFile.VideoPlaybackStatus.PAUSED -> {
-                    val mediaManager = djiManager.getMediaManagerInstance()
-                    if (mediaManager != null) {
-                        mediaManager.stop {
 
-                            it?.let { error ->
-                                setResultToToast("Stop Video Failed" + error.description)
-                            }
-                            finish()
-                        }
-                    } else {
-                        finish()
-                    }
                 }
                 else -> {
                     finish()
@@ -262,7 +205,6 @@ class MediaActivity : BaseActivity() {
         downloadDialog?.setCanceledOnTouchOutside(false)
         downloadDialog?.setCancelable(true)
         downloadDialog?.setOnCancelListener {
-            djiManager.getMediaManagerInstance()?.exitMediaDownloading()
         }
 
         btnDelete.setOnClickListener(btnClickListener)
@@ -314,16 +256,7 @@ class MediaActivity : BaseActivity() {
                     }
                 }
 
-                val mediaManager = djiManager.getMediaManagerInstance()
-                if (mediaManager != null) {
-                    mediaManager.pause { error ->
-                        if (null != error) {
-                            setResultToToast("Pause Video Failed" + error.description)
-                        }
-                    }
-                } else {
-                    errorSubject.onNext(resources.getString(R.string.error_aircraft_disconnect))
-                }
+
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
@@ -333,22 +266,7 @@ class MediaActivity : BaseActivity() {
                         return
                     }
                 }
-                val mediaManager = djiManager.getMediaManagerInstance()
-                if (mediaManager != null) {
-                    mediaManager.moveToPosition(seekBar.progress.toFloat(), { error ->
-                        if (null != error) {
-                            setResultToToast("Move to video position failed" + error.description)
-                        } else {
-                            mediaManager.resume { e ->
-                                if (null != e) {
-                                    setResultToToast("Resume Video Failed" + e.description)
-                                }
-                            }
-                        }
-                    })
-                } else {
-                    errorSubject.onNext(resources.getString(R.string.error_aircraft_disconnect))
-                }
+
             }
         })
     }
@@ -411,86 +329,11 @@ class MediaActivity : BaseActivity() {
     }
 
     private fun initMediaManager() {
-        if (djiManager.getProductInstance() == null) {
-            mediaFileList.clear()
-            fileAdapter.notifyDataSetChanged()
 
-        } else {
-            djiManager.getCameraInstance()?.let { camera ->
-                if (camera.isMediaDownloadModeSupported) {
-                    val mediaManager = camera.mediaManager
-                    mediaManager?.let {
-                        it.addUpdateFileListStateListener(updateFileListStateListener)
-
-                        it.addMediaUpdatedVideoPlaybackStateListener(updatedVideoPlaybackStateListener)
-
-                        camera.setMode(SettingsDefinitions.CameraMode.MEDIA_DOWNLOAD, {
-                            if (it == null) {
-                                getFileList()
-                            } else {
-                                setResultToToast("Set cameraMode failed:${it.description}")
-                            }
-                        })
-
-                        it.scheduler.resume {
-                            if (it != null) {
-                                setResultToToast("scheduler resume:${it.description}")
-                            }
-                        }
-
-                    }
-                } else {
-                    setResultToToast("Media Download Mode not Supported")
-                }
-            }
-        }
     }
 
     private fun getFileList() {
         showLoadDialog()
-
-        val mediaManager = djiManager.getMediaManagerInstance()
-
-        if (mediaManager != null) {
-            mediaManager.let { mm ->
-                if ((currentFileListState == MediaManager.FileListState.SYNCING) || (currentFileListState == MediaManager.FileListState.DELETING)) {
-                    setResultToToast("getFileList failed!")
-                } else {
-                    mm.refreshFileListOfStorageLocation(SettingsDefinitions.StorageLocation.SDCARD, {
-                        hidLoadDialog()
-                        if (it == null) {
-                            if (currentFileListState != MediaManager.FileListState.INCOMPLETE) {
-                                mediaFileList.clear()
-                                lastClickViewIndex = -1
-                                lastClickView = null
-                            }
-                            mediaFileList += mm.sdCardFileListSnapshot
-
-                            Collections.sort(mediaFileList, object : Comparator<MediaFile> {
-                                override fun compare(lhs: MediaFile, rhs: MediaFile): Int {
-                                    if (lhs.getTimeCreated() < rhs.getTimeCreated()) {
-                                        return 1
-                                    } else if (lhs.getTimeCreated() > rhs.getTimeCreated()) {
-                                        return -1
-                                    }
-                                    return 0
-                                }
-                            })
-
-                            runOnUiThread {
-                                fileAdapter.notifyDataSetChanged()
-                            }
-
-                        } else {
-                            setResultToToast("get file list failed:${it.description}")
-                        }
-                    })
-                }
-            }
-        } else {
-            hidLoadDialog()
-            errorSubject.onNext(resources.getString(R.string.error_aircraft_disconnect))
-        }
 
     }
 
@@ -528,7 +371,7 @@ class MediaActivity : BaseActivity() {
 
     private fun getThumbnailByMedia(media: MediaFile) {
         val task = FetchMediaTask(media, FetchMediaTaskContent.THUMBNAIL, taskCallback)
-        djiManager.getMediaManagerInstance()?.scheduler?.moveTaskToEnd(task)
+
     }
 
     private fun getPreviewByMedia(media: MediaFile) {
@@ -550,12 +393,6 @@ class MediaActivity : BaseActivity() {
             }
         })
 
-        val mediaManager = djiManager.getMediaManagerInstance()
-        if (mediaManager != null) {
-            mediaManager.scheduler?.moveTaskToEnd(task)
-        } else {
-            progressBar.visibility = View.INVISIBLE
-        }
 
     }
 
@@ -608,31 +445,7 @@ class MediaActivity : BaseActivity() {
         }
         if (mediaFileList.size > index) {
             fileToDelete.add(mediaFileList[index])
-            val mediaManager = djiManager.getMediaManagerInstance()
-            if (mediaManager != null) {
-                mediaManager.deleteFiles(fileToDelete, object : CommonCallbacks.CompletionCallbackWithTwoParam<List<MediaFile>, DJICameraError> {
-                    override fun onSuccess(x: List<MediaFile>, y: DJICameraError?) {
 
-                        runOnUiThread {
-                            val file = mediaFileList.removeAt(index)
-
-                            //Reset select view
-                            lastClickViewIndex = -1
-                            lastClickView?.isSelected = false
-                            lastClickView = null
-
-                            //Update recyclerView
-                            fileAdapter.notifyItemRemoved(index)
-                        }
-                    }
-
-                    override fun onFailure(error: DJIError) {
-                        setResultToToast("Delete file failed")
-                    }
-                })
-            } else {
-                errorSubject.onNext(resources.getString(R.string.error_aircraft_disconnect))
-            }
 
         }
     }
@@ -647,30 +460,10 @@ class MediaActivity : BaseActivity() {
         if (selectedMediaFile.mediaType == MediaFile.MediaType.MOV || selectedMediaFile.mediaType == MediaFile.MediaType.MP4) {
 
 
-            val mediaManager = djiManager.getMediaManagerInstance()
-            if (mediaManager != null) {
-                mediaManager.playVideoMediaFile(selectedMediaFile, { error ->
-                    if (null != error) {
-                        setResultToToast("Play Video Failed" + error.description)
-                    } else {
-                        runOnUiThread {
-                            fpvWidget.visibility = View.VISIBLE
-                        }
-                    }
-                })
-            } else {
-                errorSubject.onNext(resources.getString(R.string.error_aircraft_disconnect))
-            }
-
         }
     }
 
     private fun stopVideo() {
-        djiManager.getMediaManagerInstance()?.stop {
-            it?.let { error ->
-                setResultToToast("Stop Video Failed" + error.description)
-            }
-        }
     }
 
     private fun showLoadDialog() {

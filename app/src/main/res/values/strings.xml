@@ -87,13 +87,21 @@
 
     <string name="btn_require_check_code">获取验证码</string>
     <string name="btn_login">登录</string>
+    <string name="btn_open">开启</string>
+
     <string name="btn_register">注册</string>
     <string name="btn_sure">确认</string>
     <string name="btn_cancel">取消</string>
     <string name="btn_reactivation">重新激活</string>
     <string name="btn_last">上一个</string>
     <string name="btn_next">下一个</string>
+    <string name="btn_tips">提示</string>
+    <string name="btn_known">知道了</string>
 
+    <string name="title_tips">提示</string>
+
+    <string name="dialog_rc_disconnect">1、打开遥控器，等待跳出APP选择框。如果长时间等待没有跳出APP选择框，则找平板的【设置】-》【应用】-》【全部】-》寻找DJI GO4、DJI Pilot、铁路巡检 这些APP，分别点进去，点击【清除默认操作】，重启遥控器，再执行第1步；\n2、选择APP选择框里的【铁路巡检】，再点击仅此一次。\n3、打开【铁路巡检】应用软件</string>
+    <string name="dialog_flight_disconnect">打开飞机，观察遥控器是否已连上飞机，如果遥控器没连上飞机，请重启飞机或者对遥控器和飞机进行对频操作</string>
     <string name="dialog_phone_login_title">手机号码登录</string>
     <string name="dialog_phone_register_title">手机号码注册</string>
     <string name="dialog_user_login_title">帐户号码登录</string>
@@ -113,8 +121,6 @@
     <string name="air_device_entry">立即飞行</string>
     <string name="air_data_entry">飞行记录</string>
 
-    <string name="device_connected">设备已连接</string>
-    <string name="device_disconnect">设备未连接</string>
 
     <string name="api_network_error">网络连接超时</string>
     <string name="api_server_error">服务器连接错误%d</string>
@@ -153,7 +159,7 @@
     <string name="msg_aircraft_unlink">请先连接无人机！</string>
     <string name="msg_upload_success">上传成功</string>
     <string name="msg_must_login_error">必须要登录大疆帐号，否则无人机会处于新手模式，飞行时将会限高30M限远30M！</string>
-
+    <string name="msg_network_error">没有连接网络或网络不可用，联网后可帐号登录和检测版本更新,软件版本过低可能会导致无法正常使用！请尽快打开网络设置连接网络！</string>
 
     <string name="msg_user_sms_not_exist">没有请求发送验证码</string>
     <string name="msg_user_sms_code_error">验证码错误</string>
@@ -193,7 +199,20 @@
     <string name="book_vision_system">由于视觉系统容易受光照强度，物体表面纹理情况的影响。超声波在某些吸音材料上也容易出现不能正常测距的情况。在视觉系统和超声波都失效的情况下，视觉定位模式会自动切换到姿态模式。所以以下场景，谨慎使用视觉定位：\n\n1. 低空（0.5 米以下）快速飞行时，视觉定位系统可能会无法定位。纯色表面（例如纯黑、纯白、纯红、纯绿），有强烈反光或者倒影的表面；\n2. 飞行器速度不宜过快，如离地 1 米处时飞行速度不可超过 4 米/秒，离地 2 米不可超过 8 米/秒；\n3. 水面或者透明物体表面，运动物体表面（例如人流上方、大风吹动的灌木或者草丛上方），光照剧烈快速变化的场景；\n4. 在特别暗（光照小于 10LUX）或者特别亮（光照大于 10,000LUX）的物体表面；\n5. 对超声波有很强吸收作用的材质表面（例如很厚的地毯）纹理特别稀疏的表面。纹理重复度很高的物体表面（例如颜色相同的小格子砖）；\n6. 倾斜度超过 30 度的物体表面（不能收到超声波回波）； \n\n使用 P 模式飞行，如果遥控器信号断开，并且视觉定位系统工作正常，则飞行器将悬停 8 秒后自动降落；\n\n注：\n确保视觉定位系统的单目镜头清晰无污点。\n视觉定位系统使用高度为 3 米以内。\n由于视觉定位系统依赖地表图像来获取位移信息，确保周边环境光源充足，地面纹理丰富。\n视觉定位系统在水面、光线昏暗以及地面无清晰纹理的环境中无法定位。在使用视觉定位系统的过中，注意附近不要开启其它 40KHz 超声波设备，包括其它飞行器；\n由于视觉定位系统会发出人耳无法识别的超声波，该超声波或会引起动物不安，使用时请远离动物。</string>
     <string name="book_stick">1. 遥控器摇杆中位误差过大, 需要进行摇杆校准；\n2. 飞行器设定在新手模式，且周围无 GPS 信号；\n3. 飞行器传感器误差过大，飞机尾灯红灯常亮；\n4. 电调自检不通过，脚架 LED 黄灯常亮；\n5. 确认飞行器电池各项参数；\n6. 指南针误差过大，需要校准；\n7. App 飞控参数中的高度设置为 “0” 米 。</string>
 
+    <string name="rc_disconnect">遥控器未连接</string>
+    <string name="rc_connected">遥控器已连接</string>
+    <string name="rc_connected_with_name">遥控器 %s</string>
+    <string name="flight_disconnect">无人机未连接</string>
+    <string name="flight_connected">%s</string>
+    <string name="device_connecting">设备连接中(%d)</string>
+    <string name="device_disconnect">设备未连接</string>
+    <string name="device_connected">%s</string>
 
+
+    <string name="device_type_none">未知</string>
+    <string name="device_type_air_detector">先知AM V2 大气监测仪</string>
+    <string name="device_type_water_sampler">先知AM 水样采集仪</string>
+    <string name="device_type_flow_detector">先知AM 流速采集仪</string>
 
     <array name="mission_types">
         <item>网格飞行</item>

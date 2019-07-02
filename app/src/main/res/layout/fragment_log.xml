@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+	<Button
+		android:id="@+id/btnShow"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginEnd="10dp"
+		android:layout_centerVertical="true"
+		android:layout_alignParentEnd="true"
+		android:text="log"/>
+
+	<LinearLayout
+		android:id="@+id/latLog"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="horizontal"
+		android:visibility="gone"
+		android:gravity="center_vertical">
+		<ImageButton
+			android:id="@+id/btnHide"
+			android:layout_width="20dp"
+			android:layout_height="40dp"
+			android:layout_weight="1"
+			android:src="@drawable/ic_hide_right_g"
+			android:background="@drawable/layer_shadow_right_w"
+			android:paddingStart="5dp"
+			android:paddingEnd="1dp"
+			android:scaleType="fitCenter"
+			android:baselineAligned="false"/>
+
+		<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:orientation="vertical"
+			android:background="#80FFFFFF"
+			android:layout_weight="1000"
+			android:padding="10dp">
+			<View
+				android:layout_width="match_parent"
+				android:layout_height="1dp"
+				android:layout_weight="1"/>
+			<TextView
+				android:id="@+id/txtLog"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1000"
+				android:scrollbars="vertical"
+				android:singleLine="false"
+				android:scrollHorizontally="false"
+				android:textColor="@android:color/black"/>
+			<Button
+				android:id="@+id/btnClear"
+				android:layout_width="match_parent"
+				android:layout_height="50dp"
+				android:layout_weight="1"
+				android:text="clear"/>
+		</LinearLayout>
+	</LinearLayout>
+
+</RelativeLayout>

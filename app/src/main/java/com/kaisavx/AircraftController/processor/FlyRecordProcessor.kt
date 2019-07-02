@@ -7,14 +7,12 @@ import com.amap.api.services.geocoder.GeocodeResult
 import com.amap.api.services.geocoder.GeocodeSearch
 import com.amap.api.services.geocoder.RegeocodeQuery
 import com.amap.api.services.geocoder.RegeocodeResult
-import com.kaisavx.AircraftController.mamager.DJIManager2
 import com.kaisavx.AircraftController.model.FlyPoint
 import com.kaisavx.AircraftController.model.FlyRecord
 import com.kaisavx.AircraftController.util.logMethod
 import com.kaisavx.AircraftController.util.wgs84togcj02
 import dji.common.flightcontroller.FlightControllerState
 import dji.common.flightcontroller.GPSSignalLevel
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
@@ -39,6 +37,7 @@ class FlyRecordProcessor(val context: Context){
     }
 
     private fun initDisposable() {
+        /*
         disposable.add(DJIManager2.flightStateSubject
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {state ->
@@ -54,14 +53,17 @@ class FlyRecordProcessor(val context: Context){
                         }
                     }
                 })
+                */
     }
 
     private fun startProcess(){
         logMethod(this)
         flyRecord = FlyRecord(0)
+        /*
         DJIManager2.aircraftNoSubject.value?.let {
             flyRecord?.aircraftNo =it
         }
+        */
         flyRecord?.startTime = System.currentTimeMillis()
 
     }
